@@ -71,46 +71,18 @@ const WhyUs = () => {
           Our Happy Users !!
         </div>
         <div className="user-feedback-content">
-          <div className="feedback-card glass-morph">
-            <img src={userimg} alt="user-feedback" className="user-image" />
-            <p>
-              "Reflexcy helped me showcase my work beautifully. The
-              customization options are amazing!"
-            </p>
-            <div className="user-rating">⭐⭐⭐⭐⭐</div>
-            <div className="user-name">Mohanad BazerBashi</div>
-            <div className="user-role">Designer</div>
-          </div>
-          <div className="feedback-card glass-morph">
-            <img src={userimg} alt="user-feedback" className="user-image" />
-            <p>
-              "I love how easy it is to create a portfolio. The UI is smooth and
-              elegant."
-            </p>
-            <div className="user-rating">⭐⭐⭐⭐</div>
-            <div className="user-name">Sarah Johnson</div>
-            <div className="user-role">Photographer</div>
-          </div>
-          <div className="feedback-card glass-morph">
-            <img src={userimg} alt="user-feedback" className="user-image" />
-            <p>
-              "Reflexcy has simplified the way I present my work to clients.
-              Highly recommend!"
-            </p>
-            <div className="user-rating">⭐⭐⭐</div>
-            <div className="user-name">James Carter</div>
-            <div className="user-role">Web Developer</div>
-          </div>
-          <div className="feedback-card glass-morph">
-            <img src={userimg} alt="user-feedback" className="user-image" />
-            <p>
-              "A game-changer for freelancers! The platform makes online
-              portfolios effortless."
-            </p>
-            <div className="user-rating">⭐⭐⭐⭐⭐</div>
-            <div className="user-name">Emily Roberts</div>
-            <div className="user-role">Freelance Writer</div>
-          </div>
+          {[1, 2, 3, 4].map((index) => (
+            <div key={index} className="feedback-card glass-morph">
+              <img src={userimg} alt="user-feedback" className="user-image" />
+              <p>
+                Slate helps you see how many more days you need to work to reach
+                your financial goal for the month and year.
+              </p>
+              <div className="user-rating">⭐⭐⭐⭐☆</div>
+              <div className="user-name">Mohanad BazerBashi</div>
+              <div className="user-role">Designer</div>
+            </div>
+          ))}
         </div>
       </div>
       <Footer />
@@ -135,83 +107,102 @@ styles.innerHTML = `
     margin-bottom: 80px;
   }
 
+  .different-content, .what-we-do-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: -300px; /* Reduced space between text and image */
+  flex-wrap: wrap;
+}
 
-  .whyimg:hover {
-    transform: scale(1.05);
+.different-item, .what-we-do-item {
+  flex: 1;
+  max-width: 750px; /* Adjusted width for better alignment */
+  text-align: center;
+}
+
+/* Keep the same styles for images */
+.whyimg {
+  width: 100%;
+  max-width: 350px; /* Adjusted image size slightly */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.whyimg:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.glass-morph {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 15px;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 500px; /* Smaller width */
+  margin: 0 auto; /* Centers it */
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.glass-morph:hover {
+  background:#9CD1C9; 
+  transform: scale(1.05);
+  box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.4);
+}
+  .interactive {
+    margin: 50px auto;
+    width: 50%;
+    background-color: #85AFB1;
+    padding: 40px;
+    border-radius: 20px;
+    font-size: 3rem;
+    font-weight: 600;
+    text-align: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .interactive:hover {
+    transform: scale(1.1);
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.4);
   }
-  
-  .glass-morph {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 15px;
-    padding: 20px;
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 1.6;
+
+  .user-feedback-content {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .feedback-card {
+    width: 250px;
     text-align: center;
-    max-width: 500px; /* Smaller width */
-    margin: 0 auto; /* Centers it */
-    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    padding: 20px;
+    border-radius: 10px;
   }
-  
-  .glass-morph:hover {
-    background:#9CD1C9; 
-    transform: scale(1.05);
-    box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.4);
+
+  .user-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
   }
-    .interactive {
-      margin: 50px auto;
-      width: 50%;
-      background-color: #85AFB1;
-      padding: 40px;
-      border-radius: 20px;
-      font-size: 3rem;
-      font-weight: 600;
-      text-align: center;
-      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    }
-  
-    .interactive:hover {
-      transform: scale(1.1);
-      box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.4);
-    }
-  
-    .user-feedback-content {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-  
-    .feedback-card {
-      width: 250px;
-      text-align: center;
-      padding: 20px;
-      border-radius: 10px;
-    }
-  
-    .user-image {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin-bottom: 10px;
-    }
-  
-    .user-rating {
-      font-size: 20px;
-      margin: 10px 0;
-    }
-  
-    .user-name {
-      font-weight: bold;
-      color: #007BFF;
-    }
-  
-    .user-role {
-      font-style: italic;
-    }
-`;
+
+  .user-rating {
+    font-size: 20px;
+    margin: 10px 0;
+  }
+
+  .user-name {
+    font-weight: bold;
+    color: #007BFF;
+  }
+
+  .user-role {
+    font-style: italic;
+  }`;
 document.head.appendChild(styles);
