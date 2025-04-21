@@ -80,6 +80,7 @@ export default Navbar;
 const styles = document.createElement("style");
 styles.innerHTML = `
   .navbar {
+    z-index: 2;
     height: 50px;
     display: flex;
     align-items: center;

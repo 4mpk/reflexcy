@@ -21,6 +21,7 @@ import tem10 from "../frontend/assests/images/template10.png";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar";
 
 const sortOptions = [
   { label: "Newest", icon: <FaClock /> },
@@ -93,6 +94,7 @@ const HomePage = () => {
       transition={{ duration: 0.8 }}
     >
       <Navbar />
+      <Sidebar />
 
       <motion.div
         style={styles.mainContent}

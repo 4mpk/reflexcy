@@ -22,10 +22,10 @@ export default function Sidebar() {
       {/* Left Sidebar */}
       <div className={`sidebar ${isHovered ? "expanded" : ""}`}>
         {/* Top Section */}
-        <div className="sidebar-header">
+        {/* <div className="sidebar-header">
           <Box className="icon" />
           {isHovered && <span className="title">Reflexcy</span>}
-        </div>
+        </div> */}
 
         {/* Menu Items */}
         <nav className="menu">
@@ -70,6 +70,7 @@ const styles = `
     transition: all 0.3s ease;
   }
   .sidebar {
+    margin-top: 75px;
     background-color: #f8f8f8; /* Updated to off-white */
     width: 55px; /* Reduced width */
     color: black; /* Adjusted text color for contrast */
@@ -103,8 +104,9 @@ const styles = `
   }
   .menu-item span {
     margin-left: 10px;
-    opacity: 0; /* Initially hidden */
+    opacity: 1; /* Initially hidden */
     transition: opacity 0.3s ease;
+    color: black;
   }
   .menu-item:hover {
     background-color: #dcdcdc; /* Slight hover effect */
