@@ -1,0 +1,134 @@
+import React, { useState, useEffect } from "react";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import tem1 from "./assests/images/template8.png";
+import tem2 from "./assests/images/template10.png";
+import tem3 from "./assests/images/template12.png";
+import tem4 from "./assests/images/template4.png";
+
+const Favorites = () => {
+  const [pageLoaded, setPageLoaded] = useState(false);
+  const projects = [
+    { id: 1, title: "Project 1", image: tem1 },
+    { id: 2, title: "Project 2", image: tem2 },
+    { id: 3, title: "Project 3", image: tem3 },
+    { id: 4, title: "Project 4", image: tem4 },
+  ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        backgroundColor: "#F0F4F8",
+        fontFamily: "'Poppins', sans-serif",
+        opacity: pageLoaded ? 1 : 0,
+        transition: "opacity 0.8s ease-in",
+      }}
+    >
+      <Navbar /> {/* Navbar Component */}
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          paddingTop: "40px",
+          paddingBottom: "30px",
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: "15px",
+            boxShadow:
+              "8px 8px 20px rgba(0, 0, 0, 0.1), -8px -8px 20px rgba(255, 255, 255, 0.1)",
+            padding: "40px",
+            width: "100%",
+            maxWidth: "500px",
+            textAlign: "center",
+            marginBottom: "30px",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "28px",
+              fontWeight: "bold",
+              marginBottom: "30px",
+              color: "#333",
+            }}
+          >
+            Favorites
+          </h2>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "20px",
+            }}
+          >
+            {projects.map((project) => (
+              <div
+                key={project.id}
+                style={{
+                  position: "relative",
+                  overflow: "hidden",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  transition: "transform 0.3s ease",
+                }}
+              >
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    transition: "transform 0.3s ease",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    borderRadius: "50%",
+                    padding: "5px",
+                    color: "white",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#FF6347")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "rgba(0, 0, 0, 0.5)")
+                  }
+                >
+                  ❤️
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <Footer /> {/* Footer Component */}
+    </div>
+  );
+};
+
+export default Favorites;

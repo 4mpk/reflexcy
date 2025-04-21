@@ -50,13 +50,7 @@ const Navbar = () => {
         >
           <span>Features</span>
         </Link>
-        <Link
-          to="/notifications"
-          className="nav-item"
-          onClick={() => setMenuOpen(false)}
-        >
-          <span>Notifications</span>
-        </Link>
+
         <Link
           to="/updates"
           className="nav-item"
@@ -69,18 +63,11 @@ const Navbar = () => {
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
         {/* Sign Up & Log In Buttons */}
         <Link
-          to="/signup"
+          to="/AuthPage"
           className="nav-button signup-btn"
           onClick={() => setMenuOpen(false)}
         >
-          Sign Up
-        </Link>
-        <Link
-          to="/Login"
-          className="nav-button login-btn"
-          onClick={() => setMenuOpen(false)}
-        >
-          Log In
+          SignUp
         </Link>
       </div>
     </nav>

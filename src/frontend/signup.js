@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
@@ -29,17 +29,38 @@ const Signup = () => {
     console.log("Form submitted:", formData);
   };
 
+  useEffect(() => {
+    // Adding animation class when the component mounts
+    document.body.classList.add("page-enter");
+    return () => {
+      document.body.classList.remove("page-enter");
+    };
+  }, []);
+
   return (
     <>
       <style>
         {`
+          @keyframes fadeIn {
+            0% {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
           .container {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #e0f7fa,rgb(210, 230, 232));
+            background: linear-gradient(135deg, #e0f7fa, rgb(210, 230, 232));
             padding: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
           }
 
           .signup-box {
@@ -50,6 +71,7 @@ const Signup = () => {
             width: 420px;
             text-align: center;
             transition: transform 0.3s ease-in-out;
+            animation: fadeIn 1s ease-out forwards;
           }
 
           .signup-box:hover {
@@ -67,6 +89,7 @@ const Signup = () => {
             font-family: "Courier New", Courier, monospace;
             box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease-in-out;
+            animation: fadeIn 1.2s ease-out forwards;
           }
 
           .right-box:hover {
@@ -181,12 +204,16 @@ const Signup = () => {
               I agree to Reflexcy Terms and privacy policy
             </label>
 
-            <button type="submit" className="submit-button">Sign Up</button>
+            <button type="submit" className="submit-button">
+              Sign Up
+            </button>
           </form>
         </div>
         <div className="right-box">
           <h2>Hello there, sign up to get started</h2>
-          <p><b>REFLEXCY</b> helps showcase your creative work to everyone.</p>
+          <p>
+            <b>REFLEXCY</b> helps showcase your creative work to everyone.
+          </p>
           <button className="submit-button">Sign Up</button>
         </div>
       </div>
