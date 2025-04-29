@@ -7,6 +7,7 @@ import {
   FaHistory,
   FaGift,
   FaMoneyBillWave,
+  FaHeart,
 } from "react-icons/fa";
 import tem1 from "./assests/images/template1.png";
 import tem2 from "../frontend/assests/images/template2.png";
@@ -40,18 +41,78 @@ const categories = [
 ];
 
 const initialProjects = [
-  { id: 1, category: "Software", img: tem1, isPaid: false },
-  { id: 2, category: "Software", img: tem2, isPaid: true },
-  { id: 3, category: "Software", img: tem3, isPaid: false },
-  { id: 4, category: "Software", img: tem4, isPaid: true },
-  { id: 5, category: "Photography", img: tem10, isPaid: false },
-  { id: 6, category: "Photography", img: tem6, isPaid: true },
-  { id: 7, category: "Fashion", img: tem7, isPaid: false },
-  { id: 8, category: "Fashion", img: tem8, isPaid: true },
-  { id: 9, category: "Graphic Design", img: tem1, isPaid: false },
-  { id: 10, category: "Graphic Design", img: tem2, isPaid: true },
-  { id: 11, category: "Computer", img: tem9, isPaid: false },
-  { id: 12, category: "Computer", img: tem10, isPaid: true },
+  {
+    id: 1,
+    title: "Clean Software UI",
+    category: "Software",
+    img: tem1,
+    isPaid: false,
+  },
+  { id: 2, title: "Modern App", category: "Software", img: tem2, isPaid: true },
+  { id: 3, title: "Dev Tools", category: "Software", img: tem3, isPaid: false },
+  {
+    id: 4,
+    title: "Analytics UI",
+    category: "Software",
+    img: tem4,
+    isPaid: true,
+  },
+  {
+    id: 5,
+    title: "Photo Bliss",
+    category: "Photography",
+    img: tem10,
+    isPaid: false,
+  },
+  {
+    id: 6,
+    title: "Studio Light",
+    category: "Photography",
+    img: tem6,
+    isPaid: true,
+  },
+  {
+    id: 7,
+    title: "Street Style",
+    category: "Fashion",
+    img: tem7,
+    isPaid: false,
+  },
+  {
+    id: 8,
+    title: "Luxury Outfit",
+    category: "Fashion",
+    img: tem8,
+    isPaid: true,
+  },
+  {
+    id: 9,
+    title: "Poster Design",
+    category: "Graphic Design",
+    img: tem1,
+    isPaid: false,
+  },
+  {
+    id: 10,
+    title: "Creative Branding",
+    category: "Graphic Design",
+    img: tem2,
+    isPaid: true,
+  },
+  {
+    id: 11,
+    title: "PC Build Showcase",
+    category: "Computer",
+    img: tem9,
+    isPaid: false,
+  },
+  {
+    id: 12,
+    title: "Tech Stack",
+    category: "Computer",
+    img: tem10,
+    isPaid: true,
+  },
 ];
 
 const HomePage = () => {
@@ -75,7 +136,7 @@ const HomePage = () => {
       ? [...projects]
       : projects.filter((p) => p.category === selectedCategory);
 
-  // Apply sorting logic
+  // Apply sorting
   if (selectedSort === "Newest") {
     filteredProjects = filteredProjects.sort((a, b) => b.id - a.id).slice(0, 3);
   } else if (selectedSort === "Oldest") {
@@ -111,17 +172,14 @@ const HomePage = () => {
           A design portfolio is how you showcase your work to the world.
         </motion.h2>
 
+        {/* Sort & Category Filters */}
         <motion.div
           style={styles.filterContainer}
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.7 }}
         >
-          {/* Sort Dropdown */}
-          <div
-            className="sort-dropdown-container"
-            style={styles.sortDropdownContainer}
-          >
+          <div style={styles.sortDropdownContainer}>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -130,7 +188,6 @@ const HomePage = () => {
             >
               {selectedSort} <FaSort />
             </motion.button>
-
             {isSortMenuOpen && (
               <motion.ul
                 style={styles.sortDropdown}
@@ -154,7 +211,6 @@ const HomePage = () => {
             )}
           </div>
 
-          {/* Category Filter Buttons */}
           {categories.map((cat) => (
             <motion.button
               key={cat}
@@ -180,7 +236,7 @@ const HomePage = () => {
           </motion.button>
         </motion.div>
 
-        {/* Portfolio Grid */}
+        {/* Portfolio Items */}
         <motion.div
           style={styles.portfolioGrid}
           initial={{ opacity: 0 }}
@@ -196,20 +252,27 @@ const HomePage = () => {
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.6 }}
             >
-              <motion.img
-                src={project.img}
-                alt={project.category}
-                style={styles.portfolioImg}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 20,
-                }}
-              />
+              <div style={styles.imageContainer}>
+                <motion.img
+                  src={project.img}
+                  alt={project.title || "Project"}
+                  style={styles.portfolioImg}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                />
+                <div className="overlay" style={styles.overlay}>
+                  <div style={styles.overlayText}>{project.title}</div>
+                  {/* Add heart icon */}
+                  <motion.div
+                    style={styles.heartIcon}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => alert("Heart clicked!")}
+                  >
+                    <FaHeart style={styles.heartIconStyle} />
+                  </motion.div>
+                </div>
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -220,15 +283,20 @@ const HomePage = () => {
   );
 };
 
+// 🔧 CSS-in-JS Styles
 const styles = {
   pageContainer: {
     minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
   },
-  mainContent: { flex: 1, textAlign: "center", padding: "100px" },
+  mainContent: {
+    flex: 1,
+    textAlign: "center",
+    padding: "100px",
+  },
   headerText: {
-    background: "rgba(165, 210, 201, 0.8)",
+    background: "hsla(168, 33.3%, 73.5%, 0.8)",
     padding: "15px 30px",
     borderRadius: "15px",
     fontSize: "40px",
@@ -244,10 +312,10 @@ const styles = {
     justifyContent: "center",
     gap: "20px",
     marginBottom: "30px",
+    flexWrap: "wrap",
   },
   sortDropdownContainer: {
     position: "relative",
-    display: "inline-block",
     zIndex: 200,
   },
   sortButton: {
@@ -262,14 +330,13 @@ const styles = {
   sortDropdown: {
     position: "absolute",
     top: "110%",
-    left: "0",
+    left: 0,
     background: "rgba(58, 125, 130, 0.9)",
     backdropFilter: "blur(10px)",
     borderRadius: "10px",
     padding: "10px 0",
     minWidth: "160px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-    zIndex: 300,
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
     listStyle: "none",
   },
   sortOption: {
@@ -310,14 +377,71 @@ const styles = {
     height: "225px",
     borderRadius: "20px",
     overflow: "hidden",
+    position: "relative",
+  },
+  imageContainer: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
   },
   portfolioImg: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    transition: "box-shadow 0.3s ease, transform 0.3s ease",
+    borderRadius: "20px",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    opacity: 0,
+    transition: "opacity 0.3s ease-in-out",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "white",
+    fontSize: "20px",
+    fontWeight: "bold",
+    pointerEvents: "none",
+    borderRadius: "20px",
+  },
+  overlayText: {
+    padding: "10px",
+    textAlign: "center",
+  },
+  heartIcon: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    zIndex: 10,
+    cursor: "pointer",
+    opacity: 0,
+    transition: "opacity 0.3s ease-in-out",
+  },
+  heartIconStyle: {
+    fontSize: "30px",
+    color: "#ff4d4d",
   },
 };
+
+// Hover overlay effect using inline styles
+const overlayHoverStyle = `
+  .overlay:hover {
+    opacity: 1 !important;
+    pointer-events: all;
+  }
+
+  .imageContainer:hover .heartIcon {
+    opacity: 1;
+  }
+`;
+
+// Inject style into head
+const styleTag = document.createElement("style");
+styleTag.textContent = overlayHoverStyle;
+document.head.appendChild(styleTag);
 
 export default HomePage;

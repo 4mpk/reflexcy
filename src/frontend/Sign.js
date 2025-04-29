@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaFacebookF, FaGooglePlusG, FaLinkedinIn } from "react-icons/fa";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { Link } from "react-router-dom"; // Importing Link for routing
 
 export default function AuthPage() {
   const [isSignUpMode, setIsSignUpMode] = useState(true);
@@ -62,8 +63,18 @@ export default function AuthPage() {
               <span>or use your account</span>
               <input type="email" placeholder="Email" required />
               <input type="password" placeholder="Password" required />
-              <a href="#">Forgot your password?</a>
-              <button>LogIN</button>
+              {/* Link to Forgot Password Page */}
+              <Link
+                to="/Forgetpass"
+                style={{
+                  color: "#007bff",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                }}
+              >
+                Forgot your password?
+              </Link>
+              <button>Log In</button>
             </form>
           </div>
 
