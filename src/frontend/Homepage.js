@@ -427,7 +427,6 @@ const styles = {
   },
 };
 
-// Hover overlay effect using inline styles
 const overlayHoverStyle = `
   .overlay:hover {
     opacity: 1 !important;
