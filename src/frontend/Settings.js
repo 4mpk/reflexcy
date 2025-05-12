@@ -305,7 +305,8 @@ const UserSettingsPage = () => {
           {/* Danger Zone */}
           <div style={sectionStyle}>
             <label style={labelStyle}>Danger Zone</label>
-            <button style={dangerButtonStyleg
+            <button style={dangerButtonStyle} onClick={handleDelete}>
+              Delete My Account
             </button>
           </div>
 
