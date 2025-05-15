@@ -1,22 +1,86 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+const Spinner = () => (
+  <svg
+    style={{ marginBottom: "1rem" }}
+    xmlns="http://www.w3.org/2000/svg"
+    width="50"
+    height="50"
+    fill="none"
+  >
+    <circle
+      cx="25"
+      cy="25"
+      r="20"
+      stroke="#007bff"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeDasharray="60"
+      strokeDashoffset="0"
+      transform="rotate(-90 25 25)"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 25 25"
+        to="360 25 25"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </svg>
+);
+
 const FeatureRequestPage = () => {
-  const [featureRequest, setFeatureRequest] = useState({
+  const navigate = useNavigate();
+
+  const [formDetails, setFormDetails] = useState({
     featureTitle: "",
     featureDescription: "",
+    benefitExplanation: "",
+    attachment: null,
   });
+
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(5);
+  const [cancelRedirect, setCancelRedirect] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (showThankYou && !cancelRedirect) {
+      timer = setInterval(() => {
+        setRedirectCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(timer);
+            navigate("/settings");
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showThankYou, cancelRedirect, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFeatureRequest((prevRequest) => ({ ...prevRequest, [name]: value }));
+    setFormDetails((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormDetails((prev) => ({ ...prev, attachment: file }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your logic to handle feature request
-    alert("Feature request submitted");
+    setShowThankYou(true);
+  };
+
+  const handleCancelRedirect = () => {
+    setCancelRedirect(true);
   };
 
   return (
@@ -24,10 +88,10 @@ const FeatureRequestPage = () => {
       <Navbar />
       <div
         style={{
-          minHeight: "calc(100vh - 120px)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          minHeight: "calc(100vh - 120px)",
           padding: "2rem",
           backgroundColor: "#f4f7fc",
         }}
@@ -43,68 +107,191 @@ const FeatureRequestPage = () => {
             marginBottom: "2rem",
           }}
         >
-          <h2
-            style={{
-              textAlign: "center",
-              fontSize: "2rem",
-              marginBottom: "1.5rem",
-            }}
-          >
-            Request a Feature
-          </h2>
-          <form onSubmit={handleSubmit}>
-            <label style={{ display: "block", marginBottom: "1rem" }}>
-              Feature Title:
-              <input
-                type="text"
-                name="featureTitle"
-                value={featureRequest.featureTitle}
-                onChange={handleInputChange}
-                placeholder="Enter feature title"
+          {showThankYou ? (
+            <div style={{ textAlign: "center" }}>
+              <Spinner />
+              <h3
                 style={{
-                  width: "100%",
-                  padding: "0.8rem",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  marginTop: "0.5rem",
+                  color: "#28a745",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "0.5rem",
                 }}
-                required
-              />
-            </label>
-            <label style={{ display: "block", marginBottom: "1rem" }}>
-              Feature Description:
-              <textarea
-                name="featureDescription"
-                value={featureRequest.featureDescription}
-                onChange={handleInputChange}
-                placeholder="Describe the feature"
+              >
+                🚀 Thank you for your feature request!
+              </h3>
+              {!cancelRedirect ? (
+                <p>
+                  Redirecting to settings in{" "}
+                  <strong>{redirectCountdown}</strong> seconds...
+                </p>
+              ) : (
+                <p style={{ color: "gray" }}>Redirect cancelled.</p>
+              )}
+              {!cancelRedirect && (
+                <button
+                  onClick={handleCancelRedirect}
+                  style={{
+                    marginTop: "1rem",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "6px",
+                    backgroundColor: "#dc3545",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel Redirect
+                </button>
+              )}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              {/* Feature Title */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Feature Title:
+                </label>
+                <input
+                  type="text"
+                  name="featureTitle"
+                  value={formDetails.featureTitle}
+                  onChange={handleInputChange}
+                  placeholder="Enter feature title"
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    boxSizing: "border-box",
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Feature Description */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Feature Description:
+                </label>
+                <textarea
+                  name="featureDescription"
+                  value={formDetails.featureDescription}
+                  onChange={handleInputChange}
+                  placeholder="Describe the feature"
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    minHeight: "150px",
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Benefit Explanation */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  How will this feature help you?
+                </label>
+                <textarea
+                  name="benefitExplanation"
+                  value={formDetails.benefitExplanation}
+                  onChange={handleInputChange}
+                  placeholder="Explain the benefit or use case"
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    minHeight: "150px",
+                  }}
+                  required
+                />
+              </div>
+
+              {/* File Upload */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Attach a mockup or example (Optional):
+                </label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  style={{
+                    display: "block",
+                    marginTop: "0.5rem",
+                    backgroundColor: "#fafafa",
+                    padding: "0.6rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    width: "100%",
+                  }}
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
                 style={{
-                  width: "100%",
-                  padding: "0.8rem",
+                  padding: "0.8rem 1.5rem",
                   borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  marginTop: "0.5rem",
-                  minHeight: "150px",
+                  backgroundColor: "#0057ff",
+                  color: "#fff",
+                  border: "none",
+                  width: "100%",
+                  fontSize: "1.1rem",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s",
                 }}
-                required
-              />
-            </label>
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "0.8rem",
-                borderRadius: "8px",
-                backgroundColor: "#0057ff",
-                color: "#fff",
-                border: "none",
-                fontSize: "1.1rem",
-                cursor: "pointer",
-              }}
-            >
-              Submit Feature Request
-            </button>
-          </form>
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#0046d4";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "#0057ff";
+                }}
+              >
+                Submit Feature Request
+              </button>
+            </form>
+          )}
         </div>
       </div>
       <Footer />

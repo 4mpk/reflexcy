@@ -1,14 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// ✅ Blue Spinner Component for Thank You page
+const Spinner = () => (
+  <svg
+    style={{ marginBottom: "1rem" }}
+    xmlns="http://www.w3.org/2000/svg"
+    width="50" // Increased size
+    height="50" // Increased size
+    fill="none"
+  >
+    <circle
+      cx="25" // Center adjusted to match new size
+      cy="25"
+      r="20" // Increased radius
+      stroke="#007bff"
+      strokeWidth="3" // Keep it thin
+      strokeLinecap="round"
+      strokeDasharray="60"
+      strokeDashoffset="0"
+      transform="rotate(-90 25 25)" // Adjusted to new center
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 25 25"
+        to="360 25 25"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </svg>
+);
+
 const ReportBugPage = () => {
+  const navigate = useNavigate();
+
   const [bugDetails, setBugDetails] = useState({
     bugTitle: "",
     bugDescription: "",
     stepsToReproduce: "",
     screenshot: null,
   });
+
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(5);
+  const [cancelRedirect, setCancelRedirect] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (showThankYou && !cancelRedirect) {
+      timer = setInterval(() => {
+        setRedirectCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(timer);
+            navigate("/settings");
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showThankYou, cancelRedirect, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,189 +77,225 @@ const ReportBugPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your logic to handle bug submission
-    alert("Bug report submitted");
+    setShowThankYou(true); // Directly show thank you page without spinner
+  };
+
+  const handleCancelRedirect = () => {
+    setCancelRedirect(true);
   };
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
-      <Navbar /> {/* Add Navbar component */}
+      <Navbar />
       <div
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "calc(100vh - 120px)", // Ensure the form takes up space between navbar and footer
+          minHeight: "calc(100vh - 120px)",
           padding: "2rem",
-          backgroundColor: "#f4f7fc", // Light background for the page
+          backgroundColor: "#f4f7fc",
         }}
       >
         <div
           style={{
             width: "100%",
             maxWidth: "700px",
-            backgroundColor: "#ffffff", // White background for the form
+            backgroundColor: "#ffffff",
             padding: "2rem",
-            borderRadius: "12px", // Rounded corners for the form
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow
-            transition: "all 0.3s ease-in-out", // Smooth transition for hover
-            marginBottom: "2rem", // Add margin to the bottom for spacing from footer
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            marginBottom: "2rem",
           }}
         >
-          <h2
-            style={{
-              textAlign: "center",
-              fontSize: "2rem",
-              marginBottom: "1rem",
-            }}
-          >
-            Report a Bug
-          </h2>
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
+          {showThankYou ? (
+            <div style={{ textAlign: "center" }}>
+              <Spinner />
+              <h3
                 style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: "#333",
+                  color: "#28a745",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "0.5rem",
                 }}
               >
-                Bug Title:
-              </label>
-              <input
-                type="text"
-                name="bugTitle"
-                value={bugDetails.bugTitle}
-                onChange={handleInputChange}
-                placeholder="Enter bug title"
-                style={{
-                  width: "100%",
-                  padding: "0.8rem",
-                  fontSize: "1rem",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  boxSizing: "border-box",
-                  transition: "border-color 0.3s",
-                }}
-                required
-              />
+                🎉 Thank you for reporting the bug!
+              </h3>
+              {!cancelRedirect ? (
+                <p>
+                  Redirecting to settings in{" "}
+                  <strong>{redirectCountdown}</strong> seconds...
+                </p>
+              ) : (
+                <p style={{ color: "gray" }}>Redirect cancelled.</p>
+              )}
+              {!cancelRedirect && (
+                <button
+                  onClick={handleCancelRedirect}
+                  style={{
+                    marginTop: "1rem",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "6px",
+                    backgroundColor: "#dc3545",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel Redirect
+                </button>
+              )}
             </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              {/* Bug Title */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Bug Title:
+                </label>
+                <input
+                  type="text"
+                  name="bugTitle"
+                  value={bugDetails.bugTitle}
+                  onChange={handleInputChange}
+                  placeholder="Enter bug title"
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    boxSizing: "border-box",
+                  }}
+                  required
+                />
+              </div>
 
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
+              {/* Bug Description */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Bug Description:
+                </label>
+                <textarea
+                  name="bugDescription"
+                  value={bugDetails.bugDescription}
+                  onChange={handleInputChange}
+                  placeholder="Describe the bug"
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    minHeight: "150px",
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Steps to Reproduce */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Steps to Reproduce:
+                </label>
+                <textarea
+                  name="stepsToReproduce"
+                  value={bugDetails.stepsToReproduce}
+                  onChange={handleInputChange}
+                  placeholder="Steps to reproduce the bug"
+                  style={{
+                    width: "100%",
+                    padding: "0.8rem",
+                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    minHeight: "150px",
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Screenshot Upload */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Upload Screenshot (Optional):
+                </label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  style={{
+                    display: "block",
+                    marginTop: "0.5rem",
+                    backgroundColor: "#fafafa",
+                    padding: "0.6rem",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    width: "100%",
+                  }}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
                 style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: "#333",
+                  padding: "0.8rem 1.5rem",
+                  borderRadius: "8px",
+                  backgroundColor: "#0057ff",
+                  color: "#fff",
+                  border: "none",
+                  width: "100%",
+                  fontSize: "1.1rem",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s",
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#0046d4";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "#0057ff";
                 }}
               >
-                Bug Description:
-              </label>
-              <textarea
-                name="bugDescription"
-                value={bugDetails.bugDescription}
-                onChange={handleInputChange}
-                placeholder="Describe the bug"
-                style={{
-                  width: "100%",
-                  padding: "0.8rem",
-                  fontSize: "1rem",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  boxSizing: "border-box",
-                  minHeight: "150px",
-                  transition: "border-color 0.3s",
-                }}
-                required
-              />
-            </div>
-
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: "#333",
-                }}
-              >
-                Steps to Reproduce:
-              </label>
-              <textarea
-                name="stepsToReproduce"
-                value={bugDetails.stepsToReproduce}
-                onChange={handleInputChange}
-                placeholder="Provide steps to reproduce the bug"
-                style={{
-                  width: "100%",
-                  padding: "0.8rem",
-                  fontSize: "1rem",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  boxSizing: "border-box",
-                  minHeight: "150px",
-                  transition: "border-color 0.3s",
-                }}
-                required
-              />
-            </div>
-
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
-                  color: "#333",
-                }}
-              >
-                Upload Screenshot (Optional):
-              </label>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                style={{
-                  display: "block",
-                  marginTop: "0.5rem",
-                  backgroundColor: "#fafafa",
-                  padding: "0.6rem",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  width: "100%",
-                }}
-              />
-            </div>
-
-            <button
-              type="submit"
-              style={{
-                padding: "0.8rem 1.5rem",
-                borderRadius: "8px",
-                backgroundColor: "#0057ff",
-                color: "#fff",
-                border: "none",
-                width: "100%",
-                fontSize: "1.1rem",
-                cursor: "pointer",
-                transition: "background-color 0.3s, transform 0.3s",
-              }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#0046d4")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#0057ff")}
-              onFocus={(e) => (e.target.style.transform = "scale(1.05)")}
-              onBlur={(e) => (e.target.style.transform = "scale(1)")}
-            >
-              Submit Bug Report
-            </button>
-          </form>
+                Submit Bug Report
+              </button>
+            </form>
+          )}
         </div>
       </div>
-      <Footer /> {/* Add Footer component */}
+      <Footer />
     </div>
   );
 };
