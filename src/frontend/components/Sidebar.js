@@ -12,7 +12,10 @@ import {
 
 export default function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
-
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    window.location.href="/";
+  };
   return (
     <div
       className="sidebar-container"
@@ -37,10 +40,10 @@ export default function Sidebar() {
             <Settings className="icon" />
             {isHovered && <span>Settings</span>}
           </Link>
-          <Link to="/logout" className="menu-item">
+          <div to="/logout" onClick={handleLogout} className="menu-item">
             <ExternalLink className="icon" />
             {isHovered && <span>Logout</span>}
-          </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -62,6 +65,7 @@ const styles = `
     position: fixed;
     height: 100%;
     transition: all 0.3s ease;
+    z-index: 100;
   }
   .sidebar {
     margin-top: 75px;

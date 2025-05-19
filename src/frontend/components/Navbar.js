@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assests/images/reflexcylogo.png";
 import {
@@ -15,7 +15,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-const Navbar = () => {
+const Navbar =  () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -61,14 +61,13 @@ const Navbar = () => {
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
-        {/* Sign Up & Log In Buttons */}
-        <Link
+        {localStorage.getItem('access_token') == null && (<Link
           to="/AuthPage"
           className="nav-button signup-btn"
           onClick={() => setMenuOpen(false)}
         >
           SignUp
-        </Link>
+        </Link>)}
       </div>
     </nav>
   );

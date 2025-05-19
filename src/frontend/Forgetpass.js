@@ -1,7 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1);
@@ -21,32 +23,177 @@ const ForgotPassword = () => {
   const [hover, setHover] = useState(false);
   const codeRefs = useRef([]);
 
-  const handleEmailSubmit = () => {
-    if (!email.includes("@")) return alert("Please enter a valid email.");
-    setLoading(true);
-    setTimeout(() => {
-      setStep(2);
-      setLoading(false);
-    }, 1000);
-  };
-
+  const [forgetPassFormData, setForgetPassFormData] = useState({
+      email: '',
+      appName: "Reflexcy",
+    });
+  const [verifyCodeFormData, SetVerifyCodeFormData] = useState({
+      email: email,
+      code: verificationCode.join("")
+    });
+    const [ResetPasswordFormData, SetResetPasswordFormData] = useState({
+      email: email,
+      newPassword: newPassword
+    });
+    
+    const [shouldForgetPassSubmit, setShouldForgetPassSubmit] = useState(false);
+  
+    const handleForgetPassChange = (e) => {
+      setForgetPassFormData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value
+      }));
+      SetVerifyCodeFormData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value
+      }));
+      SetResetPasswordFormData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value
+      }));
+    };
+  
+    const handleForgetPassSubmit = (e) => {
+      e.preventDefault();
+      setShouldForgetPassSubmit(true); // trigger useEffect
+    };
+  
+    useEffect(() => {
+      if (!shouldForgetPassSubmit) return;
+      const submitForgetPassData = async () => {
+        setLoading(true);
+        try {
+          const response = await fetch(ENDPOINTS.SendResetPassword, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(forgetPassFormData)
+          });
+          if (response.ok) {
+            setTimeout(() => {
+              setStep(2);
+              setLoading(false);
+            }, 1000);
+            toast.success('Forget Password Email Sent successfully!');
+          } else {
+            const data = await response.json();
+            toast.error('Error: ' + data.error.message);
+          }
+        } catch (error) {
+          toast.error('Network Error: ' + error);
+        } finally {
+          setShouldForgetPassSubmit(false); // reset trigger
+        }
+      };
+  
+      submitForgetPassData();
+    }, [shouldForgetPassSubmit, forgetPassFormData]);
+  
   const handleCodeSubmit = () => {
     if (verificationCode.join("").length === 5) {
-      setStep(3);
+      setShouldVerifyPasswordSubmit(true);
     } else {
-      alert("Please enter the full 5-digit code.");
+      alert("Please enter the full 5-digit code")
     }
   };
 
+  const [shouldVerifyPasswordSubmit, setShouldVerifyPasswordSubmit] = useState(false);
+
+  useEffect(() => {
+    if (!shouldVerifyPasswordSubmit) return;
+    const submitVerifyCodeData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(ENDPOINTS.VerifyResetPassword, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(verifyCodeFormData)
+        });
+        const isSuccess = await response.json();
+        if (response.ok && isSuccess) {
+          setTimeout(() => {
+            setStep(3);
+            setLoading(false);
+          }, 1000);
+          toast.success('Verified Code successfully!');
+        } else {
+          toast.error('Code is wrong');
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } finally {
+        setShouldVerifyPasswordSubmit(false); // reset trigger
+      }
+    };
+
+    submitVerifyCodeData();
+  }, [shouldVerifyPasswordSubmit, verifyCodeFormData]);
+
   const handlePasswordSubmit = () => {
+    const isValidPassword = (password) => {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).+$/;
+      return passwordRegex.test(password);
+    };
+  
+    if (!newPassword || newPassword.trim() === "") {
+      alert("Please enter a valid password.");
+      return;
+    }
+  
+    if (!isValidPassword(newPassword)) {
+      alert("Passwords must have at least one non-alphanumeric character, one lowercase ('a'-'z'), and one uppercase ('A'-'Z').");
+      return;
+    }
+  
     if (newPassword !== confirmPassword) {
       alert("Passwords do not match.");
-    } else if (newPassword === "") {
-      alert("Please enter a valid password.");
-    } else {
-      setStep(5);
+      return;
     }
+  
+    SetResetPasswordFormData((prev) => ({
+      ...prev,
+      ["newPassword"]: newPassword
+    }));
+    setShouldResetPasswordSubmit(true);
   };
+
+  const [shouldResetPasswordSubmit, setShouldResetPasswordSubmit] = useState(false);
+
+  useEffect(() => {
+    if (!shouldResetPasswordSubmit) return;
+    const submitResetPasswordData = async () => {
+      setLoading(true);
+      try {
+        debugger
+        const response = await fetch(ENDPOINTS.ResetPassword, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(ResetPasswordFormData)
+        });
+        if (response.ok) {
+          setTimeout(() => {
+            setStep(5);
+            setLoading(false);
+          }, 1000);
+          toast.success('Password changed successfully!');
+        } else {
+          const data = await response.data();
+          toast.error('Error: ' + data.error.message);
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } finally {
+        setShouldResetPasswordSubmit(false); // reset trigger
+      }
+    };
+
+    submitResetPasswordData();
+  }, [shouldResetPasswordSubmit, ResetPasswordFormData]);
 
   const handleCodeChange = (e, index) => {
     const value = e.target.value;
@@ -55,7 +202,12 @@ const ForgotPassword = () => {
       newCode[index] = value;
       setVerificationCode(newCode);
       if (index < 4) codeRefs.current[index + 1]?.focus();
+      SetVerifyCodeFormData((prev) => ({
+        ...prev,
+        ["code"]: newCode.join("")
+      }));
     }
+
   };
 
   const styles = {
@@ -167,14 +319,13 @@ const ForgotPassword = () => {
                 style={styles.input}
                 type="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleEmailSubmit()}
+                name="email"
+                onChange={handleForgetPassChange}
               />
             </div>
             <button
               style={styles.button}
-              onClick={handleEmailSubmit}
+              onClick={handleForgetPassSubmit}
               disabled={loading}
             >
               {loading ? "Sending..." : "Send Code"}

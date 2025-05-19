@@ -129,7 +129,6 @@ const HomePage = () => {
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
   };
-
   // Filter by category
   let filteredProjects =
     selectedCategory === "All"
@@ -155,8 +154,7 @@ const HomePage = () => {
       transition={{ duration: 0.8 }}
     >
       <Navbar />
-      <Sidebar />
-
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <motion.div
         style={styles.mainContent}
         initial={{ y: 50, opacity: 0 }}
