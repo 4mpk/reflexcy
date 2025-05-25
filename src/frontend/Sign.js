@@ -3,9 +3,121 @@ import { FaFacebookF, FaGooglePlusG, FaLinkedinIn } from "react-icons/fa";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { Link } from "react-router-dom"; // Importing Link for routing
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
+import { useAuth } from './AuthContext';
 
 export default function AuthPage() {
   const [isSignUpMode, setIsSignUpMode] = useState(true);
+
+  const [registerFormData, setRegisterFormData] = useState({
+    emailAddress: '',
+    userName: '',
+    password: '',
+    appName: 'Reflexcy'
+  });
+  const [shouldRegisterSubmit, setShouldRegisterSubmit] = useState(false);
+  const [responseData, setResponseData] = useState(null);
+
+  const handleRegisterChange = (e) => {
+    setRegisterFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSignupSubmit = (e) => {
+    e.preventDefault();
+    setShouldRegisterSubmit(true); // trigger useEffect
+  };
+
+  const { setToken } = useAuth();
+
+  useEffect(() => {
+    if (!shouldRegisterSubmit) return;
+
+    const submitRegisterData = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.Register, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(registerFormData)
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          toast.success('Registered successfully!');
+          setResponseData(data); // store success response
+          setIsSignUpMode(false);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          toast.error('Error: ' + data.error.message);
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } finally {
+        setShouldRegisterSubmit(false); // reset trigger
+      }
+    };
+
+    submitRegisterData();
+  }, [shouldRegisterSubmit, registerFormData]);
+
+  const [loginFormData, setLoginFormData] = useState({
+    emailAddress: '',
+    password: '',
+  });
+
+  const [shouldLoginSubmit, setShouldLoginSubmit] = useState(false);
+
+  const handleLoginChange = (e) => {
+    setLoginFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    setShouldLoginSubmit(true); //
+  };
+
+  useEffect(() => {
+    if (!shouldLoginSubmit) return;
+
+    const submitLoginData = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.Login, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginFormData)
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem('access_token', data.access_token);
+          setToken(data.access_token);
+          window.location.href = "/";
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          toast.error('Error: Invalid email or password');
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } finally {
+        setShouldLoginSubmit(false); // reset trigger
+      }
+    };
+
+    submitLoginData();
+  }, [shouldLoginSubmit, loginFormData]);
+
 
   // Add smooth entry animation
   useEffect(() => {
@@ -24,7 +136,7 @@ export default function AuthPage() {
         >
           {/* Sign Up Form */}
           <div className="form-container sign-up-container">
-            <form action="#">
+            <form onSubmit={handleSignupSubmit}>
               <h1>Create Account</h1>
               <div className="social-container">
                 <a href="#" className="social-icon">
@@ -38,16 +150,16 @@ export default function AuthPage() {
                 </a>
               </div>
               <span>or use your email for registration</span>
-              <input type="text" placeholder="Name" required />
-              <input type="email" placeholder="Email" required />
-              <input type="password" placeholder="Password" required />
+              <input type="email" placeholder="emailAddress" name="emailAddress" value={registerFormData.emailAddress} onChange={handleRegisterChange} required />
+              <input type="text" placeholder="userName" name="userName" value={registerFormData.userName} onChange={handleRegisterChange} required />
+              <input type="password" placeholder="Password" name="password" value={registerFormData.password} onChange={handleRegisterChange} required />
               <button>Sign Up</button>
             </form>
           </div>
 
           {/* Sign In Form */}
           <div className="form-container sign-in-container">
-            <form action="#">
+            <form onSubmit={handleLoginSubmit}>
               <h1>Login</h1>
               <div className="social-container">
                 <a href="#" className="social-icon">
@@ -61,8 +173,8 @@ export default function AuthPage() {
                 </a>
               </div>
               <span>or use your account</span>
-              <input type="email" placeholder="Email" required />
-              <input type="password" placeholder="Password" required />
+              <input type="email" placeholder="Email" name="emailAddress" value={loginFormData.emailAddress} onChange={handleLoginChange} required />
+              <input type="password" placeholder="Password" name="password" value={loginFormData.password} onChange={handleLoginChange} required />
               {/* Link to Forgot Password Page */}
               <Link
                 to="/Forgetpass"
@@ -110,7 +222,7 @@ export default function AuthPage() {
       <style jsx>{`
         .authPage {
           background: #f6f5f7;
-          padding-top: 80px;
+          padding-top: 110px;
           padding-bottom: 80px;
           display: flex;
           justify-content: center;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // Changed from useHistory to us
 import contactImage from "./assests/images/contact.png";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
+import Sidebar from "./components/Sidebar";
 const ContactForm = () => {
   const [hover, setHover] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading
@@ -29,6 +29,7 @@ const ContactForm = () => {
   return (
     <>
       <Navbar />
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div style={styles.wrapper}>
         <div style={styles.contactContainer}>
           <div style={styles.leftContainer}>
@@ -114,6 +115,7 @@ const styles = {
     opacity: 0, // Initially hidden
     animation: "fadeIn 1.5s ease-in forwards",
     margin: 0, //
+    paddingTop: "110px"
   },
   contactContainer: {
     display: "flex",

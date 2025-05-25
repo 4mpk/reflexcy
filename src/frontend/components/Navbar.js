@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assests/images/reflexcylogo.png";
 import {
@@ -15,7 +15,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-const Navbar = () => {
+const Navbar =  () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -61,14 +61,13 @@ const Navbar = () => {
       </div>
 
       <div className={`nav-links ${menuOpen ? "active" : ""}`}>
-        {/* Sign Up & Log In Buttons */}
-        <Link
+        {localStorage.getItem('access_token') == null && (<Link
           to="/AuthPage"
           className="nav-button signup-btn"
           onClick={() => setMenuOpen(false)}
         >
           SignUp
-        </Link>
+        </Link>)}
       </div>
     </nav>
   );
@@ -80,7 +79,7 @@ export default Navbar;
 const styles = document.createElement("style");
 styles.innerHTML = `
   .navbar {
-    z-index: 2;
+    z-index: 201;
     height: 50px;
     display: flex;
     align-items: center;
@@ -88,7 +87,8 @@ styles.innerHTML = `
     background: #9CD1C9;
     padding: 12px 20px;
     font-family: Arial, sans-serif;
-    position: relative;
+    position: fixed;
+    width: 100%;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
  
   }
@@ -128,6 +128,7 @@ styles.innerHTML = `
   .nav-links {
     display: flex;
     gap: 20px;
+    margin: 0px 30px;
   }
 
   .nav-links a {
