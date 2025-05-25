@@ -1,19 +1,78 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import tem1 from "./assests/images/template8.png";
-import tem2 from "./assests/images/template10.png";
-import tem3 from "./assests/images/template12.png";
-import tem4 from "./assests/images/template4.png";
-
+import initialProjects from "./InitialProjects";
+import { toast } from 'react-toastify';
+import ENDPOINTS from "./RequestUrls";
+import Sidebar from "./components/Sidebar";
 const Favorites = () => {
   const [pageLoaded, setPageLoaded] = useState(false);
-  const projects = [
-    { id: 1, title: "Project 1", image: tem1 },
-    { id: 2, title: "Project 2", image: tem2 },
-    { id: 3, title: "Project 3", image: tem3 },
-    { id: 4, title: "Project 4", image: tem4 },
-  ];
+  const [projects, setProjects] = useState([]);
+
+  let token = localStorage.getItem('access_token');
+  useEffect(() => {
+    const GetFavorites = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.FavoriteList, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        if (response.ok) {
+          const items = await response.json();  
+          const ids = items.map(item => item.templateId);
+          const favoriteProjects = initialProjects.filter(project => ids.includes(project.id));
+          setProjects(favoriteProjects);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.json();
+          toast.error('Error: ' + data.error.message);
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } 
+    };
+
+    GetFavorites();
+  }, []);
+
+  const [favoriteProjectId, setFavoriteProjectId] = useState(0);
+  const [shouldMakeFavoriteRequest, setshouldMakeFavoriteRequest] = useState(false);
+  useEffect(() => {
+    if (!shouldMakeFavoriteRequest) return;
+    const submitDataForm = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.MakeFavorite + `?templateId=${favoriteProjectId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+        if (response.ok) {
+            window.location.reload();
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.data();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setshouldMakeFavoriteRequest(false); // reset trigger
+      }
+    };
+
+    submitDataForm();
+  }, [shouldMakeFavoriteRequest, favoriteProjectId]);
+
+  const handleMakeFavoriteRequest = (projectId) => {
+    setFavoriteProjectId(projectId);
+    setshouldMakeFavoriteRequest(true);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,6 +95,7 @@ const Favorites = () => {
       }}
     >
       <Navbar /> {/* Navbar Component */}
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div
         style={{
           flex: 1,
@@ -43,7 +103,7 @@ const Favorites = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "flex-start",
-          paddingTop: "40px",
+          paddingTop: "110px",
           paddingBottom: "30px",
         }}
       >
@@ -90,7 +150,7 @@ const Favorites = () => {
                 }}
               >
                 <img
-                  src={project.image}
+                  src={project.img}
                   alt={project.title}
                   style={{
                     width: "100%",
@@ -104,22 +164,23 @@ const Favorites = () => {
                     position: "absolute",
                     top: "10px",
                     right: "10px",
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    backgroundColor: "#FF6347",
                     borderRadius: "50%",
-                    padding: "5px",
+                    padding: "5px 12px",
                     color: "white",
                     fontSize: "24px",
                     cursor: "pointer",
                     transition: "background-color 0.3s ease",
                   }}
+                  onClick={() => handleMakeFavoriteRequest(project.id)}
                   onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = "#FF6347")
-                  }
-                  onMouseLeave={(e) =>
                     (e.target.style.backgroundColor = "rgba(0, 0, 0, 0.5)")
                   }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#FF6347")
+                  }
                 >
-                  ❤️
+                  ♡
                 </div>
               </div>
             ))}

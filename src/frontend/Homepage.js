@@ -9,20 +9,12 @@ import {
   FaMoneyBillWave,
   FaHeart,
 } from "react-icons/fa";
-import tem1 from "./assests/images/template1.png";
-import tem2 from "../frontend/assests/images/template2.png";
-import tem3 from "../frontend/assests/images/template3.png";
-import tem4 from "../frontend/assests/images/template4.png";
-import tem5 from "../frontend/assests/images/template6.png";
-import tem6 from "../frontend/assests/images/template5.png";
-import tem7 from "../frontend/assests/images/template7.png";
-import tem8 from "../frontend/assests/images/template8.png";
-import tem9 from "../frontend/assests/images/template9.png";
-import tem10 from "../frontend/assests/images/template10.png";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
+import initialProjects from "./InitialProjects";
+import ENDPOINTS from "./RequestUrls";
 
 const sortOptions = [
   { label: "Newest", icon: <FaClock /> },
@@ -40,84 +32,10 @@ const categories = [
   "Computer",
 ];
 
-const initialProjects = [
-  {
-    id: 1,
-    title: "Clean Software UI",
-    category: "Software",
-    img: tem1,
-    isPaid: false,
-  },
-  { id: 2, title: "Modern App", category: "Software", img: tem2, isPaid: true },
-  { id: 3, title: "Dev Tools", category: "Software", img: tem3, isPaid: false },
-  {
-    id: 4,
-    title: "Analytics UI",
-    category: "Software",
-    img: tem4,
-    isPaid: true,
-  },
-  {
-    id: 5,
-    title: "Photo Bliss",
-    category: "Photography",
-    img: tem10,
-    isPaid: false,
-  },
-  {
-    id: 6,
-    title: "Studio Light",
-    category: "Photography",
-    img: tem6,
-    isPaid: true,
-  },
-  {
-    id: 7,
-    title: "Street Style",
-    category: "Fashion",
-    img: tem7,
-    isPaid: false,
-  },
-  {
-    id: 8,
-    title: "Luxury Outfit",
-    category: "Fashion",
-    img: tem8,
-    isPaid: true,
-  },
-  {
-    id: 9,
-    title: "Poster Design",
-    category: "Graphic Design",
-    img: tem1,
-    isPaid: false,
-  },
-  {
-    id: 10,
-    title: "Creative Branding",
-    category: "Graphic Design",
-    img: tem2,
-    isPaid: true,
-  },
-  {
-    id: 11,
-    title: "PC Build Showcase",
-    category: "Computer",
-    img: tem9,
-    isPaid: false,
-  },
-  {
-    id: 12,
-    title: "Tech Stack",
-    category: "Computer",
-    img: tem10,
-    isPaid: true,
-  },
-];
-
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [projects, setProjects] = useState(initialProjects);
+  const [favProjectIds, setFavProjectIds] = useState([]);
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Sort By");
 
@@ -125,7 +43,73 @@ const HomePage = () => {
     setSelectedSort(option.label);
     setIsSortMenuOpen(false);
   };
+  const [favoriteProjectId, setFavoriteProjectId] = useState(0);
+  const [shouldMakeFavoriteRequest, setshouldMakeFavoriteRequest] = useState(false);
+  useEffect(() => {
+    if (!shouldMakeFavoriteRequest) return;
+    const submitDataForm = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.MakeFavorite + `?templateId=${favoriteProjectId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+        if (response.ok) {
+            window.location.reload();
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.data();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setshouldMakeFavoriteRequest(false); // reset trigger
+      }
+    };
 
+    submitDataForm();
+  }, [shouldMakeFavoriteRequest, favoriteProjectId]);
+
+  const handleCartClick = (projectId) => {
+    localStorage.setItem('ProjectId', projectId);
+    window.location.href="/DataForm";
+  };
+
+  const handleMakeFavoriteRequest = (projectId) => {
+    setFavoriteProjectId(projectId);
+    setshouldMakeFavoriteRequest(true);
+  };
+
+  let token = localStorage.getItem('access_token');
+  useEffect(() => {
+    const GetFavorites = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.FavoriteList, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        if (response.ok) {
+          const items = await response.json();  
+          const ids = items.map(item => item.templateId);
+          const favoriteProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
+          setFavProjectIds(favoriteProjectIds);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.json();
+        }
+      } catch (error) {
+      } 
+    };
+
+    GetFavorites();
+  }, []);
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
   };
@@ -249,6 +233,7 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.6 }}
+              
             >
               <div style={styles.imageContainer}>
                 <motion.img
@@ -256,19 +241,32 @@ const HomePage = () => {
                   alt={project.title || "Project"}
                   style={styles.portfolioImg}
                   whileHover={{ scale: 1.05 }}
+                  onClick={() => handleCartClick(project.id)}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 />
-                <div className="overlay" style={styles.overlay}>
-                  <div style={styles.overlayText}>{project.title}</div>
-                  {/* Add heart icon */}
-                  <motion.div
-                    style={styles.heartIcon}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => alert("Heart clicked!")}
-                  >
-                    <FaHeart style={styles.heartIconStyle} />
-                  </motion.div>
+                
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    backgroundColor: favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
+                    borderRadius: "50%",
+                    padding: "5px 12px",
+                    color: "white",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onClick={() => handleMakeFavoriteRequest(project.id)}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
+                  }
+                >
+                  ♡
                 </div>
               </div>
             </motion.div>
@@ -354,6 +352,7 @@ const styles = {
     borderRadius: "25px",
     cursor: "pointer",
     fontSize: "18px",
+    zIndex: 1
   },
   filterIcon: {
     background: "#5c9ea6",

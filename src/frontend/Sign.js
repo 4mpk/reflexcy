@@ -51,6 +51,8 @@ export default function AuthPage() {
           toast.success('Registered successfully!');
           setResponseData(data); // store success response
           setIsSignUpMode(false);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
         } else {
           toast.error('Error: ' + data.error.message);
         }
@@ -101,6 +103,8 @@ export default function AuthPage() {
           localStorage.setItem('access_token', data.access_token);
           setToken(data.access_token);
           window.location.href = "/";
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
         } else {
           toast.error('Error: Invalid email or password');
         }
@@ -218,7 +222,7 @@ export default function AuthPage() {
       <style jsx>{`
         .authPage {
           background: #f6f5f7;
-          padding-top: 80px;
+          padding-top: 110px;
           padding-bottom: 80px;
           display: flex;
           justify-content: center;

@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 
 const DataForm = () => {
   const [formData, setFormData] = useState({
+    projectId: Number(localStorage.getItem('ProjectId') ?? 0),
     firstName: "",
     middleName: "",
     lastName: "",
@@ -11,7 +14,7 @@ const DataForm = () => {
     dob: "",
     email: "",
     phone: "",
-    bio: "", // Added bio field
+    bio: "",
     currentJob: "",
     previousJob: "",
     skills: "",
@@ -22,6 +25,7 @@ const DataForm = () => {
     experience: "",
     projectDetails: "",
     projectLinks: "",
+    certification: "",
     certifications: [],
     profilePic: null,
   });
@@ -44,20 +48,56 @@ const DataForm = () => {
     }
   };
 
+  const [shouldDataFormSubmit, setShouldDataFormSubmit] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!formData.firstName || !formData.email) {
+    
+    if (!formData.firstName || !formData.email || !formData.dob) {
       alert("Please fill in all required fields.");
       return;
     }
-
-    console.log("Form submitted:", formData);
+    setShouldDataFormSubmit(true);
   };
+
+  useEffect(() => {
+    if (!shouldDataFormSubmit) return;
+    const submitDataForm = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.DataForm, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+          body: JSON.stringify(formData)
+        });
+        if (response.ok) {
+          setTimeout(() => {
+            toast.success('Form submitted successfully!');
+            window.location.href = "/";
+          }, 1000);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.data();
+          toast.error('Some thing went wrong please try again');
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error('Some thing went wrong please try again');
+      } finally {
+        setShouldDataFormSubmit(false); // reset trigger
+      }
+    };
+
+    submitDataForm();
+  }, [shouldDataFormSubmit, formData]);
 
   const handleClear = () => {
     if (window.confirm("Are you sure you want to clear the form?")) {
       setFormData({
+        projectId: Number(localStorage.getItem('ProjectId') ?? 0),
         firstName: "",
         middleName: "",
         lastName: "",
@@ -76,6 +116,7 @@ const DataForm = () => {
         experience: "",
         projectDetails: "",
         projectLinks: "",
+        certification: "",
         certifications: [],
         profilePic: null,
       });
@@ -97,32 +138,36 @@ const DataForm = () => {
                 name="firstName"
                 placeholder="First Name"
                 onChange={handleChange}
+                value={formData.firstName}
               />
               <input
                 type="text"
                 name="middleName"
                 placeholder="Middle Name"
                 onChange={handleChange}
+                value={formData.middleName}
               />
               <input
                 type="text"
                 name="lastName"
                 placeholder="Last Name"
                 onChange={handleChange}
+                value={formData.lastName}
               />
             </div>
             <div className="row">
-              <select name="gender" onChange={handleChange}>
+              <select name="gender" onChange={handleChange} value={formData.gender}>
                 <option value="">Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
-              <input type="date" name="dob" onChange={handleChange} />
+              <input type="date" name="dob" onChange={handleChange} value={formData.dob}/>
               <input
                 type="email"
                 name="email"
                 placeholder="Email"
                 onChange={handleChange}
+                value={formData.email}
               />
             </div>
           </div>
@@ -135,6 +180,7 @@ const DataForm = () => {
                 name="phone"
                 placeholder="Phone Number"
                 onChange={handleChange}
+                value={formData.phone}
               />
             </div>
             <div className="row">
@@ -143,6 +189,7 @@ const DataForm = () => {
                 placeholder="Write a short bio about yourself"
                 onChange={handleChange}
                 rows="4"
+                value={formData.bio}
               />
             </div>
           </div>
@@ -178,6 +225,7 @@ const DataForm = () => {
                 name="experience"
                 placeholder="Experience"
                 onChange={handleChange}
+                value={formData.experience}
               />
             </div>
             <div className="project-field">
@@ -186,12 +234,14 @@ const DataForm = () => {
                 name="projectDetails"
                 placeholder="Project Details"
                 onChange={handleChange}
+                value={formData.projectDetails}
               />
               <input
                 type="text"
                 name="projectLinks"
                 placeholder="Project Links"
                 onChange={handleChange}
+                value={formData.projectLinks}
               />
             </div>
           </div>
@@ -204,24 +254,28 @@ const DataForm = () => {
                 name="linkedin"
                 placeholder="LinkedIn URL"
                 onChange={handleChange}
+                value={formData.linkedin}
               />
               <input
                 type="url"
                 name="github"
                 placeholder="GitHub URL"
                 onChange={handleChange}
+                value={formData.github}
               />
               <input
                 type="url"
                 name="instagram"
                 placeholder="Instagram URL"
                 onChange={handleChange}
+                value={formData.instagram}
               />
               <input
                 type="url"
                 name="tiktok"
                 placeholder="TikTok URL"
                 onChange={handleChange}
+                value={formData.tiktok}
               />
             </div>
           </div>
@@ -231,15 +285,17 @@ const DataForm = () => {
             <div className="certification-upload">
               <input
                 type="text"
-                name="certifications"
+                name="certification"
                 placeholder="Certification Name"
                 onChange={handleChange}
+                value={formData.certification}
               />
               <input
                 type="file"
                 name="certificationFile"
                 multiple
                 onChange={handleChange}
+                value={formData.certificationFile}
               />
               <div className="file-preview">
                 {formData.certifications.length > 0 && (

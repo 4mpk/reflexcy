@@ -5,7 +5,7 @@ import tem1 from "./assests/images/template12.png";
 import tem2 from "./assests/images/template10.png";
 import tem3 from "./assests/images/template8.png";
 import tem4 from "./assests/images/template9.png";
-
+import Sidebar from "./components/Sidebar";
 const Projects = () => {
   const [showAll, setShowAll] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -45,6 +45,7 @@ const Projects = () => {
       }}
     >
       <Navbar /> {/* Navbar Component */}
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div
         style={{
           flex: 1,
@@ -52,7 +53,7 @@ const Projects = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "flex-start",
-          paddingTop: "40px",
+          paddingTop: "110px",
           paddingBottom: "30px",
         }}
       >

@@ -79,7 +79,7 @@ export default Navbar;
 const styles = document.createElement("style");
 styles.innerHTML = `
   .navbar {
-    z-index: 2;
+    z-index: 201;
     height: 50px;
     display: flex;
     align-items: center;
@@ -87,7 +87,8 @@ styles.innerHTML = `
     background: #9CD1C9;
     padding: 12px 20px;
     font-family: Arial, sans-serif;
-    position: relative;
+    position: fixed;
+    width: 100%;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
  
   }
@@ -127,6 +128,7 @@ styles.innerHTML = `
   .nav-links {
     display: flex;
     gap: 20px;
+    margin: 0px 30px;
   }
 
   .nav-links a {

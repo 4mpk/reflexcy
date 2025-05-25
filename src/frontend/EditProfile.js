@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
-
+import Sidebar from "./components/Sidebar";
 const EditProfile = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState("");
@@ -85,7 +85,7 @@ const EditProfile = () => {
       }
     >
       <Navbar />
-
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div style={styles.mainContent}>
         <div style={styles.profileBox}>
           <h2 style={styles.title}>Edit Your Profile</h2>
@@ -201,8 +201,8 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: "40px",
     paddingBottom: "30px",
+    paddingTop: "110px",
   },
   profileBox: {
     background: "#fff", // White background for clean feel

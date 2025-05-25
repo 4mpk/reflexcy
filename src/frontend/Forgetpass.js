@@ -76,6 +76,8 @@ const ForgotPassword = () => {
               setLoading(false);
             }, 1000);
             toast.success('Forget Password Email Sent successfully!');
+          } else if (response.status == "401") {
+            localStorage.removeItem('access_token');
           } else {
             const data = await response.json();
             toast.error('Error: ' + data.error.message);
@@ -119,6 +121,8 @@ const ForgotPassword = () => {
             setLoading(false);
           }, 1000);
           toast.success('Verified Code successfully!');
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
         } else {
           toast.error('Code is wrong');
         }
@@ -167,7 +171,6 @@ const ForgotPassword = () => {
     const submitResetPasswordData = async () => {
       setLoading(true);
       try {
-        debugger
         const response = await fetch(ENDPOINTS.ResetPassword, {
           method: 'POST',
           headers: {
@@ -181,6 +184,8 @@ const ForgotPassword = () => {
             setLoading(false);
           }, 1000);
           toast.success('Password changed successfully!');
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
         } else {
           const data = await response.data();
           toast.error('Error: ' + data.error.message);
@@ -214,13 +219,12 @@ const ForgotPassword = () => {
     container: {
       maxWidth: "500px",
       width: "90%",
-      margin: "100px auto",
+      margin: "0px auto 100px auto",
       padding: "60px 40px",
       backgroundColor: "#9cd1c9",
       borderRadius: "10px",
       boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
       textAlign: "center",
-      marginTop: "80px", // Adjust the margin to account for the Navbar
     },
     header: {
       fontSize: "1.5em",
@@ -306,7 +310,7 @@ const ForgotPassword = () => {
     <div>
       {/* Navbar */}
       <Navbar />
-
+      <div style={{paddingBottom: "110px"}}></div>
       <div style={styles.container}>
         {/* Step 1: Email Input */}
         {step === 1 && (

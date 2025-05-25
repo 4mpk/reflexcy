@@ -37,6 +37,7 @@ const UserSettingsPage = () => {
     fontFamily: "Arial, sans-serif",
     backgroundColor: theme === "light" ? "#f4f4f4" : "#121212",
     color: theme === "light" ? "#000" : "#f4f4f4",
+    paddingTop: "75px"
   };
 
   const sidebarStyle = {
