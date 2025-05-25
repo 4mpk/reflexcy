@@ -17,6 +17,11 @@ import ForgotPassword from "./frontend/Forgetpass.js";
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './frontend/AuthContext.js';
 
+import Settings from "./frontend/Settings.js";
+import ContactSupportPage from "./frontend/ContactSupportPage.js";
+import ReportBugPage from "./frontend/ReportBugPage.js";
+import FeatureRequestPage from "./frontend/FeatureRequestPage.js";
+import FeedbackPage from "./frontend/FeedbackPage.js";
 function App() {
   return (
     <AuthProvider>
@@ -37,6 +42,11 @@ function App() {
           <Route path="/features" element={<Features />} />
           <Route path="/updates" element={<UpdatesPage />} />
           <Route path="/forgetpass" element={<ForgotPassword />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/ContactSupport" element={<ContactSupportPage />} />
+          <Route path="/ReportBug" element={<ReportBugPage />} />
+          <Route path="/FeatureRequest" element={<FeatureRequestPage />} />
+          <Route path="/Feedback" element={<FeedbackPage />} />
         </Routes>
       </Router>
     </AuthProvider>
