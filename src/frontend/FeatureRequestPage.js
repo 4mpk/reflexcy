@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 const Spinner = () => (
   <svg
     style={{ marginBottom: "1rem" }}
@@ -38,9 +39,9 @@ const FeatureRequestPage = () => {
   const navigate = useNavigate();
 
   const [formDetails, setFormDetails] = useState({
-    featureTitle: "",
-    featureDescription: "",
-    benefitExplanation: "",
+    title: "",
+    description: "",
+    befefit: "",
     attachment: null,
   });
 
@@ -74,9 +75,31 @@ const FeatureRequestPage = () => {
     setFormDetails((prev) => ({ ...prev, attachment: file }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowThankYou(true);
+    try {
+      const body = new FormData();
+      for (const key in formDetails) {
+        if (formDetails.hasOwnProperty(key)) {
+          body.append(key, formDetails[key]);
+        }
+      }
+      const response = await fetch(ENDPOINTS.RequestFeature, {
+        method: 'POST',
+        body: body
+      });
+      if (response.ok) {
+        toast.success('Form submitted successfully!');
+        setShowThankYou(true);
+      } else {
+        const data = await response.json();
+        toast.error('Error: ' + data.error.message);
+      }
+    } catch (error) {
+      toast.error('Network Error: ' + error);
+    }
+
+    // You can add your submission logic here (e.g., API call)
   };
 
   const handleCancelRedirect = () => {
@@ -94,6 +117,7 @@ const FeatureRequestPage = () => {
           minHeight: "calc(100vh - 120px)",
           padding: "2rem",
           backgroundColor: "#f4f7fc",
+          paddingTop: "110px"
         }}
       >
         <div
@@ -163,8 +187,8 @@ const FeatureRequestPage = () => {
                 </label>
                 <input
                   type="text"
-                  name="featureTitle"
-                  value={formDetails.featureTitle}
+                  name="title"
+                  value={formDetails.title}
                   onChange={handleInputChange}
                   placeholder="Enter feature title"
                   style={{
@@ -193,8 +217,8 @@ const FeatureRequestPage = () => {
                   Feature Description:
                 </label>
                 <textarea
-                  name="featureDescription"
-                  value={formDetails.featureDescription}
+                  name="description"
+                  value={formDetails.description}
                   onChange={handleInputChange}
                   placeholder="Describe the feature"
                   style={{
@@ -223,10 +247,10 @@ const FeatureRequestPage = () => {
                   How will this feature help you?
                 </label>
                 <textarea
-                  name="benefitExplanation"
-                  value={formDetails.benefitExplanation}
+                  name="befefit"
+                  value={formDetails.befefit}
                   onChange={handleInputChange}
-                  placeholder="Explain the benefit or use case"
+                  placeholder="Explain the befefit or use case"
                   style={{
                     width: "100%",
                     padding: "0.8rem",

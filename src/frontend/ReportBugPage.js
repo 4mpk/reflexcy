@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 
 // ✅ Blue Spinner Component for Thank You page
 const Spinner = () => (
@@ -39,9 +41,9 @@ const ReportBugPage = () => {
   const navigate = useNavigate();
 
   const [bugDetails, setBugDetails] = useState({
-    bugTitle: "",
-    bugDescription: "",
-    stepsToReproduce: "",
+    title: "",
+    description: "",
+    steps: "",
     screenshot: null,
   });
 
@@ -75,9 +77,29 @@ const ReportBugPage = () => {
     setBugDetails((prevDetails) => ({ ...prevDetails, screenshot: file }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowThankYou(true); // Directly show thank you page without spinner
+    try {
+      const body = new FormData();
+      for (const key in bugDetails) {
+        if (bugDetails.hasOwnProperty(key)) {
+          body.append(key, bugDetails[key]);
+        }
+      }
+      const response = await fetch(ENDPOINTS.ReportBug, {
+        method: 'POST',
+        body: body
+      });
+      if (response.ok) {
+        toast.success('Form submitted successfully!');
+        setShowThankYou(true);
+      } else {
+        const data = await response.json();
+        toast.error('Error: ' + data.error.message);
+      }
+    } catch (error) {
+      toast.error('Network Error: ' + error);
+    }
   };
 
   const handleCancelRedirect = () => {
@@ -95,6 +117,7 @@ const ReportBugPage = () => {
           minHeight: "calc(100vh - 120px)",
           padding: "2rem",
           backgroundColor: "#f4f7fc",
+          paddingTop: "110px"
         }}
       >
         <div
@@ -164,8 +187,8 @@ const ReportBugPage = () => {
                 </label>
                 <input
                   type="text"
-                  name="bugTitle"
-                  value={bugDetails.bugTitle}
+                  name="title"
+                  value={bugDetails.title}
                   onChange={handleInputChange}
                   placeholder="Enter bug title"
                   style={{
@@ -194,8 +217,8 @@ const ReportBugPage = () => {
                   Bug Description:
                 </label>
                 <textarea
-                  name="bugDescription"
-                  value={bugDetails.bugDescription}
+                  name="description"
+                  value={bugDetails.description}
                   onChange={handleInputChange}
                   placeholder="Describe the bug"
                   style={{
@@ -224,8 +247,8 @@ const ReportBugPage = () => {
                   Steps to Reproduce:
                 </label>
                 <textarea
-                  name="stepsToReproduce"
-                  value={bugDetails.stepsToReproduce}
+                  name="steps"
+                  value={bugDetails.steps}
                   onChange={handleInputChange}
                   placeholder="Steps to reproduce the bug"
                   style={{

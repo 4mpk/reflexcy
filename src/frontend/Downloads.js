@@ -7,7 +7,8 @@ import ENDPOINTS from "./RequestUrls";
 import Sidebar from "./components/Sidebar";
 const Downloads = () => {
   const [pageLoaded, setPageLoaded] = useState(false);
-  const [projects, setProjects] = useState(initialProjects);
+  // const [projects, setProjects] = useState(initialProjects);
+  const [forms, SetForms] = useState([]);
 
   let token = localStorage.getItem('access_token');
   useEffect(() => {
@@ -21,10 +22,14 @@ const Downloads = () => {
           },
         });
         if (response.ok) {
-          const items = await response.json();  
-          const ids = items.map(item => item.projectId);
-          const downloadProjects = initialProjects.filter(project => ids.includes(project.id));
-          setProjects(downloadProjects);
+          const items = await response.json();
+          const ids = items.map(item => ({
+            id: item.id,
+            project: initialProjects.find(e => e.id == item.projectId)
+          }));
+          SetForms(ids);
+          // const downloadProjects = initialProjects.filter(project => ids.includes(project.id));
+          // setProjects(downloadProjects);
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
         } else {
@@ -33,7 +38,7 @@ const Downloads = () => {
         }
       } catch (error) {
         toast.error('Network Error: ' + error);
-      } 
+      }
     };
 
     GetDownloads();
@@ -46,7 +51,48 @@ const Downloads = () => {
 
     return () => clearTimeout(timer);
   }, []);
+  const handleClick = async (formId) => {
+    try {
+      const response = await fetch(ENDPOINTS.DownloadFile + `?dataFormId=${formId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      if (response.ok) {
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
 
+        // Optionally get filename from headers
+        const contentDisposition = response.headers.get("Content-Disposition");
+        let fileName = "downloaded-file";
+        if (contentDisposition && contentDisposition.includes("filename=")) {
+          fileName = contentDisposition
+            .split("filename=")[1]
+            .replace(/"/g, "")
+            .trim();
+        }
+        a.download = fileName;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+
+        toast.success('File downloaded successfully!');
+      } else if (response.status == "401") {
+        localStorage.removeItem('access_token');
+      } else {
+        const data = await response.json();
+        toast.error('Error: ' + data.error.message);
+      }
+    } catch (error) {
+      toast.error('Network Error: ' + error);
+    }
+  }
   return (
     <div
       style={{
@@ -99,13 +145,13 @@ const Downloads = () => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: projects.length > 0 ? "repeat(auto-fill, minmax(200px, 1fr))" : "none",
+              gridTemplateColumns: forms.length > 0 ? "repeat(auto-fill, minmax(200px, 1fr))" : "none",
               gap: "20px",
             }}
           >
-            {projects.length > 0 && projects.map((project) => (
+            {forms.length > 0 && forms.map((form) => (
               <div
-                key={project.id}
+                key={form.id}
                 style={{
                   position: "relative",
                   overflow: "hidden",
@@ -115,19 +161,20 @@ const Downloads = () => {
                 }}
               >
                 <img
-                  src={project.img}
-                  alt={project.title}
+                  src={form.project.img}
+                  alt={form.project.title}
                   style={{
                     width: "100%",
                     height: "200px",
                     objectFit: "cover",
                     transition: "transform 0.3s ease",
                   }}
+                  onClick={() => handleClick(form.id)}
                 />
               </div>
             ))}
 
-            {projects.length == 0 && (
+            {forms.length == 0 && (
               <p style={{ color: "#666", fontSize: "16px" }}>
                 No downloads available at the moment.
               </p>

@@ -8,42 +8,68 @@ const DataForm = () => {
   const [formData, setFormData] = useState({
     projectId: Number(localStorage.getItem('ProjectId') ?? 0),
     firstName: "",
-    middleName: "",
     lastName: "",
-    gender: "",
-    dob: "",
     email: "",
     phone: "",
+    vision: "",
     bio: "",
-    currentJob: "",
-    previousJob: "",
     skills: "",
-    linkedin: "",
-    github: "",
-    instagram: "",
-    tiktok: "",
-    experience: "",
-    projectDetails: "",
-    projectLinks: "",
-    certification: "",
-    certifications: [],
-    profilePic: null,
+    profile: null,
+    departmentName: "",
+    universityName: "",
+    dateOfGraduation: "",
+    firstPositionTitle: "",
+    firstPositionDescription: "",
+    firstPositionEndDate: "",
+    secondPositionTitle: "",
+    secondPositionDescription: "",
+    secondPositionEndDate: "",
+    thirdPositionTitle: "",
+    thirdPositionDescription: "",
+    thirdPositionEndDate: "",
+    firstProjectName: "",
+    firstProjectDescription: "",
+    firstProjectPicture: null,
+    secondProjectName: "",
+    secondProjectDescription: "",
+    secondProjectPicture: null,
+    thirdProjectName: "",
+    thirdProjectDescription: "",
+    thirdProjectPicture: null,
+    linkedinUrl: "",
+    facebookUrl: "",
+    instagramUrl: "",
+    xUrl: "",
   });
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
-    if (name === "certificationFile") {
+    debugger
+    if (name === "profile") {
       setFormData({
         ...formData,
-        certifications: [...formData.certifications, ...Array.from(files)],
+        profile: files[0],
       });
-    } else if (name === "profilePic") {
+    }
+    else if (name === "firstProjectPicture") {
       setFormData({
         ...formData,
-        profilePic: files[0],
+        firstProjectPicture: files[0],
       });
-    } else {
+    } 
+    else if (name === "secondProjectPicture") {
+      setFormData({
+        ...formData,
+        secondProjectPicture: files[0],
+      });
+    } 
+    else if (name === "thirdProjectPicture") {
+      setFormData({
+        ...formData,
+        thirdProjectPicture: files[0],
+      });
+    }  
+    else {
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -53,7 +79,7 @@ const DataForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (!formData.firstName || !formData.email || !formData.dob) {
+    if (!formData.firstName || !formData.email) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -64,19 +90,43 @@ const DataForm = () => {
     if (!shouldDataFormSubmit) return;
     const submitDataForm = async () => {
       try {
+        const body = new FormData();
+        for (const key in formData) {
+          if (formData.hasOwnProperty(key)) {
+            body.append(key, formData[key]);
+          }
+        }
         const response = await fetch(ENDPOINTS.DataForm, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           },
-          body: JSON.stringify(formData)
+          body: body
         });
         if (response.ok) {
-          setTimeout(() => {
-            toast.success('Form submitted successfully!');
-            window.location.href = "/";
-          }, 1000);
+          const blob = await response.blob();
+          // Create file download
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+
+          // Optionally get filename from headers
+          const contentDisposition = response.headers.get("Content-Disposition");
+          let fileName = "downloaded-file";
+          if (contentDisposition && contentDisposition.includes("filename=")) {
+            fileName = contentDisposition
+              .split("filename=")[1]
+              .replace(/"/g, "")
+              .trim();
+          }
+          a.download = fileName;
+
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(downloadUrl);
+
+          toast.success('File downloaded successfully!');
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
         } else {
@@ -99,26 +149,38 @@ const DataForm = () => {
       setFormData({
         projectId: Number(localStorage.getItem('ProjectId') ?? 0),
         firstName: "",
-        middleName: "",
         lastName: "",
-        gender: "",
-        dob: "",
         email: "",
         phone: "",
-        bio: "", // Clear bio field
-        currentJob: "",
-        previousJob: "",
+        vision: "",
+        bio: "",
         skills: "",
-        linkedin: "",
-        github: "",
-        instagram: "",
-        tiktok: "",
-        experience: "",
-        projectDetails: "",
-        projectLinks: "",
-        certification: "",
-        certifications: [],
-        profilePic: null,
+        profile: null,
+        departmentName: "",
+        universityName: "",
+        dateOfGraduation: "",
+        firstPositionTitle: "",
+        firstPositionDescription: "",
+        firstPositionEndDate: "",
+        secondPositionTitle: "",
+        secondPositionDescription: "",
+        secondPositionEndDate: "",
+        thirdPositionTitle: "",
+        thirdPositionDescription: "",
+        thirdPositionEndDate: "",
+        firstProjectName: "",
+        firstProjectDescription: "",
+        firstProjectPicture: null,
+        secondProjectName: "",
+        secondProjectDescription: "",
+        secondProjectPicture: null,
+        thirdProjectName: "",
+        thirdProjectDescription: "",
+        thirdProjectPicture: null,
+        linkedinUrl: "",
+        facebookUrl: "",
+        instagramUrl: "",
+        x: "",
       });
     }
   };
@@ -126,6 +188,7 @@ const DataForm = () => {
   return (
     <>
       <Navbar />
+<div style={{paddingTop: "110px"}}>
 
       <div className="form-container">
         <h2>Data Form to Create Your Portfolio</h2>
@@ -142,26 +205,13 @@ const DataForm = () => {
               />
               <input
                 type="text"
-                name="middleName"
-                placeholder="Middle Name"
-                onChange={handleChange}
-                value={formData.middleName}
-              />
-              <input
-                type="text"
                 name="lastName"
                 placeholder="Last Name"
                 onChange={handleChange}
                 value={formData.lastName}
               />
-            </div>
-            <div className="row">
-              <select name="gender" onChange={handleChange} value={formData.gender}>
-                <option value="">Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-              <input type="date" name="dob" onChange={handleChange} value={formData.dob}/>
+              </div>
+              <div className="row">
               <input
                 type="email"
                 name="email"
@@ -169,12 +219,6 @@ const DataForm = () => {
                 onChange={handleChange}
                 value={formData.email}
               />
-            </div>
-          </div>
-
-          <div className="section phone-bio">
-            <h3>Contact Information</h3>
-            <div className="row">
               <input
                 type="tel"
                 name="phone"
@@ -183,13 +227,36 @@ const DataForm = () => {
                 value={formData.phone}
               />
             </div>
+          </div>
+
+          <div className="section phone-bio">
+            <h3>About me</h3>
+            <div className="row">
+              <textarea
+                name="vision"
+                placeholder="Write the vision"
+                onChange={handleChange}
+                rows="3"
+                value={formData.vision}
+              />
+            </div>
             <div className="row">
               <textarea
                 name="bio"
                 placeholder="Write a short bio about yourself"
                 onChange={handleChange}
-                rows="4"
+                rows="3"
                 value={formData.bio}
+              />
+            </div>
+
+            <div className="row">
+              <textarea
+                name="skills"
+                placeholder="Write your skills"
+                onChange={handleChange}
+                rows="3"
+                value={formData.skills}
               />
             </div>
           </div>
@@ -199,14 +266,14 @@ const DataForm = () => {
             <div className="row">
               <input
                 type="file"
-                name="profilePic"
+                name="profile"
                 accept="image/*"
                 onChange={handleChange}
               />
-              {formData.profilePic && (
+              {formData.profile && (
                 <div className="profile-pic-preview">
                   <img
-                    src={URL.createObjectURL(formData.profilePic)}
+                    src={URL.createObjectURL(formData.profile)}
                     alt="Profile Preview"
                     width="100"
                     height="100"
@@ -217,32 +284,235 @@ const DataForm = () => {
             </div>
           </div>
 
-          <div className="section experience-section">
-            <h3>Experience & Projects</h3>
-            <div className="experience-field">
+          <div className="section education">
+            <h3>Education</h3>
+            <div className="certification-upload">
               <input
                 type="text"
-                name="experience"
-                placeholder="Experience"
+                name="departmentName"
+                placeholder="Department Name"
                 onChange={handleChange}
-                value={formData.experience}
+                value={formData.departmentName}
+              />
+              <input
+                type="text"
+                name="universityName"
+                placeholder="university Name"
+                onChange={handleChange}
+                value={formData.universityName}
+              />
+              <input
+                type="number" min="1"
+                name="dateOfGraduation"
+                placeholder="Date Of Graduation"
+                onChange={handleChange}
+                value={formData.dateOfGraduation}
               />
             </div>
-            <div className="project-field">
+          </div>
+
+          <div className="section experience-section">
+            <h3>Experience</h3>
+            <div className="row">
               <input
                 type="text"
-                name="projectDetails"
-                placeholder="Project Details"
+                name="firstPositionTitle"
+                placeholder="First Position title"
                 onChange={handleChange}
-                value={formData.projectDetails}
+                value={formData.firstPositionTitle}
               />
+            </div>
+            <div className="row">
+              <textarea
+                type="text"
+                name="firstPositionDescription"
+                placeholder="First Position Description"
+                rows="3"
+                onChange={handleChange}
+                value={formData.firstPositionDescription}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="number" min="1"
+                name="firstPositionEndDate"
+                placeholder="First Position End Date"
+                onChange={handleChange}
+                value={formData.firstPositionEndDate}
+              />
+            </div>
+            <div className="row mt-5">
               <input
                 type="text"
-                name="projectLinks"
-                placeholder="Project Links"
+                name="secondPositionTitle"
+                placeholder="Second Position title"
                 onChange={handleChange}
-                value={formData.projectLinks}
+                value={formData.secondPositionTitle}
               />
+            </div>
+            <div className="row">
+              <textarea
+                type="text"
+                name="secondPositionDescription"
+                placeholder="Second Position Description"
+                rows="3"
+                onChange={handleChange}
+                value={formData.secondPositionDescription}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="number" min="1"
+                name="secondPositionEndDate"
+                placeholder="Second Position End Date"
+                onChange={handleChange}
+                value={formData.secondPositionEndDate}
+              />
+            </div>
+            <div className="row mt-5">
+              <input
+                type="text"
+                name="thirdPositionTitle"
+                placeholder="Third Position title"
+                onChange={handleChange}
+                value={formData.thirdPositionTitle}
+              />
+            </div>
+            <div className="row">
+              <textarea
+                type="text"
+                name="thirdPositionDescription"
+                placeholder="Third Position Description"
+                rows="3"
+                onChange={handleChange}
+                value={formData.thirdPositionDescription}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="number" min="1"
+                name="thirdPositionEndDate"
+                placeholder="Third Position End Date"
+                onChange={handleChange}
+                value={formData.thirdPositionEndDate}
+              />
+            </div>
+          </div>
+          <div className="section project-section">
+            <h3>Projects</h3>
+            <div className="row">
+              <input
+                type="text"
+                name="firstProjectName"
+                placeholder="First Project Name"
+                onChange={handleChange}
+                value={formData.firstProjectName}
+              />
+            </div>
+            <div className="row">
+              <textarea
+                type="text"
+                name="firstProjectDescription"
+                placeholder="First Project Description"
+                rows="3"
+                onChange={handleChange}
+                value={formData.firstProjectDescription}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="file"
+                name="firstProjectPicture"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              {formData.firstProjectPicture && (
+                <div className="profile-pic-preview">
+                  <img
+                    src={URL.createObjectURL(formData.firstProjectPicture)}
+                    alt="First Project Picture"
+                    width="100"
+                    height="100"
+                    style={{ borderRadius: "50%", objectFit: "cover" }}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="row mt-5">
+              <input
+                type="text"
+                name="secondProjectName"
+                placeholder="Second Project Name"
+                onChange={handleChange}
+                value={formData.secondProjectName}
+              />
+            </div>
+             <div className="row">
+              <textarea
+                type="text"
+                name="secondProjectDescription"
+                placeholder="Second Project Description"
+                rows="3"
+                onChange={handleChange}
+                value={formData.secondProjectDescription}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="file"
+                name="secondProjectPicture"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              {formData.secondProjectPicture && (
+                <div className="profile-pic-preview">
+                  <img
+                    src={URL.createObjectURL(formData.secondProjectPicture)}
+                    alt="Second Project Picture"
+                    width="100"
+                    height="100"
+                    style={{ borderRadius: "50%", objectFit: "cover" }}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="row mt-5">
+              <input
+                type="text"
+                name="thirdProjectName"
+                placeholder="Third Project Name"
+                onChange={handleChange}
+                value={formData.thirdProjectName}
+              />
+            </div>
+             <div className="row">
+              <textarea
+                type="text"
+                name="thirdProjectDescription"
+                placeholder="Third Project Description"
+                rows="3"
+                onChange={handleChange}
+                value={formData.thirdProjectDescription}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="file"
+                name="thirdProjectPicture"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              {formData.thirdProjectPicture && (
+                <div className="profile-pic-preview">
+                  <img
+                    src={URL.createObjectURL(formData.thirdProjectPicture)}
+                    alt="Third Project Picture"
+                    width="100"
+                    height="100"
+                    style={{ borderRadius: "50%", objectFit: "cover" }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -250,64 +520,35 @@ const DataForm = () => {
             <h3>Social Links</h3>
             <div className="row">
               <input
-                type="url"
-                name="linkedin"
+                type="text"
+                name="linkedinUrl"
                 placeholder="LinkedIn URL"
                 onChange={handleChange}
-                value={formData.linkedin}
+                value={formData.linkedinUrl}
               />
-              <input
-                type="url"
-                name="github"
-                placeholder="GitHub URL"
-                onChange={handleChange}
-                value={formData.github}
-              />
-              <input
-                type="url"
-                name="instagram"
-                placeholder="Instagram URL"
-                onChange={handleChange}
-                value={formData.instagram}
-              />
-              <input
-                type="url"
-                name="tiktok"
-                placeholder="TikTok URL"
-                onChange={handleChange}
-                value={formData.tiktok}
-              />
-            </div>
-          </div>
-
-          <div className="section certifications">
-            <h3>Certifications</h3>
-            <div className="certification-upload">
               <input
                 type="text"
-                name="certification"
-                placeholder="Certification Name"
+                name="facebookUrl"
+                placeholder="Facebook URL"
                 onChange={handleChange}
-                value={formData.certification}
+                value={formData.facebookUrl}
+              />
+              </div>
+            <div className="row">
+              <input
+                type="url"
+                name="instagramUrl"
+                placeholder="Instagram URL"
+                onChange={handleChange}
+                value={formData.instagramUrl}
               />
               <input
-                type="file"
-                name="certificationFile"
-                multiple
+                type="url"
+                name="xUrl"
+                placeholder="X URL"
                 onChange={handleChange}
-                value={formData.certificationFile}
+                value={formData.xUrl}
               />
-              <div className="file-preview">
-                {formData.certifications.length > 0 && (
-                  <ul>
-                    {formData.certifications.map((file, index) => (
-                      <li key={index}>
-                        {file.name} (Size: {(file.size / 1024).toFixed(2)} KB)
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
             </div>
           </div>
 
@@ -354,7 +595,9 @@ const DataForm = () => {
             .profile-pic {
               margin-top: 15px;
             }
-
+            .mt-5 {
+              margin-top: 50px;
+            }
             .row {
               display: flex;
               justify-content: space-between;
@@ -454,6 +697,7 @@ const DataForm = () => {
           `}
         </style>
       </div>
+</div>
 
       <Footer />
     </>

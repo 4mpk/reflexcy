@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 // Blue Spinner Component (same as ReportBugPage)
 const Spinner = () => (
   <svg
@@ -68,10 +69,31 @@ const FeedbackPage = () => {
     setFeedback((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const body = new FormData();
+      for (const key in feedback) {
+        if (feedback.hasOwnProperty(key)) {
+          body.append(key, feedback[key]);
+        }
+      }
+      const response = await fetch(ENDPOINTS.Feedback, {
+        method: 'POST',
+        body: body
+      });
+      if (response.ok) {
+        toast.success('Form submitted successfully!');
+        setShowThankYou(true);
+      } else {
+        const data = await response.json();
+        toast.error('Error: ' + data.error.message);
+      }
+    } catch (error) {
+      toast.error('Network Error: ' + error);
+    }
+
     // You can add your submission logic here (e.g., API call)
-    setShowThankYou(true);
   };
 
   const handleCancelRedirect = () => {
@@ -89,6 +111,7 @@ const FeedbackPage = () => {
           minHeight: "calc(100vh - 120px)",
           padding: "2rem",
           backgroundColor: "#f4f7fc",
+          paddingTop: "110px"
         }}
       >
         <div

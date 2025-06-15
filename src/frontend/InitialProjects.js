@@ -18,7 +18,7 @@ const initialProjects = [
     img: tem1,
     isPaid: false,
   },
-  { id: 2, title: "Modern App", category: "Software", img: tem2, isPaid: true },
+  { id: 2, title: "Modern App", category: "Software", img: tem2, isPaid: true, price: "20$" },
   { id: 3, title: "Dev Tools", category: "Software", img: tem3, isPaid: false },
   {
     id: 4,
@@ -26,6 +26,7 @@ const initialProjects = [
     category: "Software",
     img: tem4,
     isPaid: true,
+    price: "5$"
   },
   {
     id: 5,
@@ -40,6 +41,7 @@ const initialProjects = [
     category: "Photography",
     img: tem6,
     isPaid: true,
+    price: "50$"
   },
   {
     id: 7,
@@ -54,6 +56,7 @@ const initialProjects = [
     category: "Fashion",
     img: tem8,
     isPaid: true,
+    price: "25$"
   },
   {
     id: 9,
@@ -68,6 +71,7 @@ const initialProjects = [
     category: "Graphic Design",
     img: tem2,
     isPaid: true,
+    price: "10$"
   },
   {
     id: 11,
@@ -82,6 +86,7 @@ const initialProjects = [
     category: "Computer",
     img: tem10,
     isPaid: true,
+    price: "35$"
   },
 ];
 

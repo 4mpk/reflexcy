@@ -21,7 +21,7 @@ const Favorites = () => {
           },
         });
         if (response.ok) {
-          const items = await response.json();  
+          const items = await response.json();
           const ids = items.map(item => item.templateId);
           const favoriteProjects = initialProjects.filter(project => ids.includes(project.id));
           setProjects(favoriteProjects);
@@ -33,7 +33,7 @@ const Favorites = () => {
         }
       } catch (error) {
         toast.error('Network Error: ' + error);
-      } 
+      }
     };
 
     GetFavorites();
@@ -53,7 +53,7 @@ const Favorites = () => {
           },
         });
         if (response.ok) {
-            window.location.reload();
+          window.location.reload();
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
         } else {

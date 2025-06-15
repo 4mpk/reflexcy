@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 
 const ContactSupportPage = () => {
   const [formData, setFormData] = useState({
@@ -38,9 +40,29 @@ const ContactSupportPage = () => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowThankYou(true);
+    try {
+        const body = new FormData();
+          for (const key in formData) {
+            if (formData.hasOwnProperty(key)) {
+              body.append(key, formData[key]);
+            }
+        }
+        const response = await fetch(ENDPOINTS.ContactSupport, {
+          method: 'POST',
+          body: body
+        });
+        if (response.ok) {
+          toast.success('Form submitted successfully!');
+          setShowThankYou(true);
+        } else {
+          const data = await response.json();
+          toast.error('Error: ' + data.error.message);
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } 
   };
 
   const handleCancelRedirect = () => {
@@ -58,6 +80,7 @@ const ContactSupportPage = () => {
           alignItems: "center",
           padding: "2rem",
           backgroundColor: "#f4f7fc",
+          paddingTop: "110px"
         }}
       >
         <div
