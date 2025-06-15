@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 import Sidebar from "./components/Sidebar";
+import ENDPOINTS from "./RequestUrls";
 const EditProfile = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState("");
@@ -15,6 +16,29 @@ const EditProfile = () => {
   const [showPassword, setShowPassword] = useState(false); // State for controlling password visibility
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(ENDPOINTS.GetProfileImage, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+        if (response.ok) {
+          const result = await response.json();
+          setProfileImage(result.url);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.data();
+        }
+      } catch (error) {
+        console.error("Upload failed:", error);
+      }
+    }
+    fetchData();
+  }, [])
+  useEffect(() => {
     const timer = setTimeout(() => {
       setPageLoaded(true);
     }, 100);
@@ -22,20 +46,58 @@ const EditProfile = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleImageChange = (event) => {
+  const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      if (file.type.startsWith("image/")) {
-        const imageUrl = URL.createObjectURL(file);
-        setProfileImage(imageUrl);
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload a valid image file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file); // Match your API param: IFormFile file
+
+    try {
+      const response = await fetch(ENDPOINTS.UploadProfile, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: formData,
+      });
+      if (response.ok) {
+        setProfileImage(URL.createObjectURL(file));
+        setError(null);
+      } else if (response.status == "401") {
+        localStorage.removeItem('access_token');
       } else {
-        setError("Please upload a valid image file.");
+        const data = await response.data();
       }
+    } catch (error) {
+      console.error("Upload failed:", error);
     }
   };
 
-  const handleRemoveImage = () => {
-    setProfileImage(null);
+  const handleRemoveImage = async () => {
+    try {
+      const response = await fetch(ENDPOINTS.DeleteProfileImage, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+      });
+      if (response.ok) {
+        setProfileImage(null);
+      } else if (response.status == "401") {
+        localStorage.removeItem('access_token');
+      } else {
+        const data = await response.data();
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
   };
 
   const saveProfile = async (profileData) => {
@@ -78,10 +140,10 @@ const EditProfile = () => {
         pageLoaded
           ? { ...styles.pageContainer, opacity: 1 }
           : {
-              ...styles.pageContainer,
-              opacity: 0,
-              transition: "opacity 0.8s ease-in",
-            }
+            ...styles.pageContainer,
+            opacity: 0,
+            transition: "opacity 0.8s ease-in",
+          }
       }
     >
       <Navbar />
@@ -166,7 +228,7 @@ const EditProfile = () => {
           {successMessage && <p style={styles.success}>{successMessage}</p>}
 
           <div style={styles.buttonContainer}>
-            <button style={styles.button} disabled={loading} onClick={() => {}}>
+            <button style={styles.button} disabled={loading} onClick={() => { }}>
               Cancel
             </button>
             <button

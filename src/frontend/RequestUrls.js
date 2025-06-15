@@ -13,6 +13,15 @@ const ENDPOINTS = {
   DownloadFile: `${BASE_URL}/Templates/PDF`,
   FavoriteList: `${BASE_URL}/Favorites/GetAll`,
   MakeFavorite: `${BASE_URL}/Favorites/MakeFavorite`,
+  SavedList: `${BASE_URL}/SavedProjects/GetAll`,
+  MakeSave: `${BASE_URL}/SavedProjects/MakeSave`,
+  UploadProfile: `${BASE_URL}/File/uploadProfileImage`,
+  GetProfileImage: `${BASE_URL}/File/GetProfileImage`,
+  DeleteProfileImage: `${BASE_URL}/File/DeleteProfileImage`,
+  ContactSupport: `${BASE_URL}/Entities/ContactSupport`,
+  ReportBug: `${BASE_URL}/Entities/ReportBug`,
+  Feedback: `${BASE_URL}/Entities/Feedback`,
+  RequestFeature: `${BASE_URL}/Entities/RequestFeature`,
 };
 
 export default ENDPOINTS;

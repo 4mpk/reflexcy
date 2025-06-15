@@ -36,8 +36,10 @@ const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [projects, setProjects] = useState(initialProjects);
   const [favProjectIds, setFavProjectIds] = useState([]);
+  const [savedProjectIds, setSavedProjectIds] = useState([]);
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Sort By");
+  const [searchText, setSearchText] = useState("");
 
   const handleSortSelection = (option) => {
     setSelectedSort(option.label);
@@ -73,6 +75,36 @@ const HomePage = () => {
     submitDataForm();
   }, [shouldMakeFavoriteRequest, favoriteProjectId]);
 
+  const [savedProjectId, setSaveProjectId] = useState(0);
+  const [shouldMakeSaveRequest, setshouldMakeSaveRequest] = useState(false);
+  useEffect(() => {
+    if (!shouldMakeSaveRequest) return;
+    const submitDataForm = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.MakeSave + `?templateId=${savedProjectId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+        if (response.ok) {
+            window.location.reload();
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.data();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setshouldMakeSaveRequest(false); // reset trigger
+      }
+    };
+
+    submitDataForm();
+  }, [shouldMakeSaveRequest, savedProjectId]);
+
   const handleCartClick = (projectId) => {
     localStorage.setItem('ProjectId', projectId);
     window.location.href="/DataForm";
@@ -81,6 +113,11 @@ const HomePage = () => {
   const handleMakeFavoriteRequest = (projectId) => {
     setFavoriteProjectId(projectId);
     setshouldMakeFavoriteRequest(true);
+  };
+
+  const handleMakeSaveRequest = (projectId) => {
+    setSaveProjectId(projectId);
+    setshouldMakeSaveRequest(true);
   };
 
   let token = localStorage.getItem('access_token');
@@ -110,15 +147,50 @@ const HomePage = () => {
 
     GetFavorites();
   }, []);
+  useEffect(() => {
+    const GetSavedProjects = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.SavedList, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        if (response.ok) {
+          const items = await response.json();  
+          const ids = items.map(item => item.templateId);
+          const savedProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
+          setSavedProjectIds(savedProjectIds);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.json();
+        }
+      } catch (error) {
+      } 
+    };
+
+    GetSavedProjects();
+  }, []);
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
   };
   // Filter by category
-  let filteredProjects =
-    selectedCategory === "All"
-      ? [...projects]
-      : projects.filter((p) => p.category === selectedCategory);
-
+  
+  const handleSearchProjects = (e) => {
+    setSearchText(e.target.value);
+  }
+  let filteredProjects = [...projects];
+  if (selectedCategory !== "All" || searchText !== "")
+  {
+    if (selectedCategory !== "All") {
+      filteredProjects = filteredProjects.filter((p) => p.category === selectedCategory);
+    }
+    if (searchText !== "") {
+      filteredProjects = filteredProjects.filter((p) => p.title.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
+    }
+  }
   // Apply sorting
   if (selectedSort === "Newest") {
     filteredProjects = filteredProjects.sort((a, b) => b.id - a.id).slice(0, 3);
@@ -137,7 +209,7 @@ const HomePage = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      <Navbar />
+      <Navbar onChange={handleSearchProjects}/>
       {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <motion.div
         style={styles.mainContent}
@@ -226,7 +298,8 @@ const HomePage = () => {
           transition={{ duration: 0.5 }}
         >
           {filteredProjects.map((project) => (
-            <motion.div
+            <div>
+<motion.div
               key={project.id}
               style={styles.portfolioItem}
               initial={{ opacity: 0, y: 20 }}
@@ -268,8 +341,37 @@ const HomePage = () => {
                 >
                   ♡
                 </div>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "55px",
+                    backgroundColor: savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
+                    borderRadius: "50%",
+                    padding: "5px 12px",
+                    color: "white",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onClick={() => handleMakeSaveRequest(project.id)}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
+                  }
+                >
+                  <i class="fas fa-save"></i>
+                </div>
               </div>
+
             </motion.div>
+            <div style={{display: "flex", justifyContent: "space-between", margin: "0px 15px 15px"}}>
+            <span>{project.title}</span>  
+            <span>{project.isPaid ? project.price : "Free"}</span>  
+            </div>
+            </div>
           ))}
         </motion.div>
       </motion.div>

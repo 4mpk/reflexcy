@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import tem1 from "./assests/images/template12.png";
-import tem2 from "./assests/images/template10.png";
-import tem3 from "./assests/images/template8.png";
-import tem4 from "./assests/images/template9.png";
 import Sidebar from "./components/Sidebar";
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
+import initialProjects from "./InitialProjects";
 const Projects = () => {
-  const [showAll, setShowAll] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
-  const projects = [
-    { id: 1, title: "Project 1", image: tem1 },
-    { id: 2, title: "Project 2", image: tem2 },
-    { id: 3, title: "Project 3", image: tem3 },
-    { id: 4, title: "Project 4", image: tem4 },
-  ];
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,12 +17,69 @@ const Projects = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleButtonClick = (buttonType) => {
-    if (buttonType === "ALL") {
-      setShowAll(true); // Show all projects
-    } else if (buttonType === "Trash") {
-      setShowAll(false); // Show only 2 projects for trash
-    }
+  let token = localStorage.getItem('access_token');
+  useEffect(() => {
+    const GetSaveProjects = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.SavedList, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        });
+        if (response.ok) {
+          const items = await response.json();  
+          const ids = items.map(item => item.templateId);
+          const favoriteProjects = initialProjects.filter(project => ids.includes(project.id));
+          setProjects(favoriteProjects);
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.json();
+          toast.error('Error: ' + data.error.message);
+        }
+      } catch (error) {
+        toast.error('Network Error: ' + error);
+      } 
+    };
+
+    GetSaveProjects();
+  }, []);
+
+  const [saveProjectId, setSaveProjectId] = useState(0);
+  const [shouldMakeSaveRequest, setshouldMakeSaveRequest] = useState(false);
+  useEffect(() => {
+    if (!shouldMakeSaveRequest) return;
+    const submitDataForm = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.MakeSave + `?templateId=${saveProjectId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+        if (response.ok) {
+            window.location.reload();
+        } else if (response.status == "401") {
+          localStorage.removeItem('access_token');
+        } else {
+          const data = await response.data();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setshouldMakeSaveRequest(false); // reset trigger
+      }
+    };
+
+    submitDataForm();
+  }, [shouldMakeSaveRequest, saveProjectId]);
+
+  const handleMakeSaveRequest = (projectId) => {
+    setSaveProjectId(projectId);
+    setshouldMakeSaveRequest(true);
   };
 
   return (
@@ -81,46 +131,6 @@ const Projects = () => {
             Projects
           </h2>
 
-          <div style={{ marginBottom: "20px" }}>
-            <button
-              onClick={() => handleButtonClick("ALL")}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#007bff",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                transition: "background-color 0.3s ease, transform 0.3s ease",
-              }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = "#0056b3")}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = "#007bff")}
-              onMouseDown={(e) => (e.target.style.transform = "scale(0.98)")}
-              onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-            >
-              ALL +
-            </button>
-            <button
-              onClick={() => handleButtonClick("Trash")}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#FF6347",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                marginLeft: "10px",
-                cursor: "pointer",
-                transition: "background-color 0.3s ease, transform 0.3s ease",
-              }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = "#d9534f")}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = "#FF6347")}
-              onMouseDown={(e) => (e.target.style.transform = "scale(0.98)")}
-              onMouseUp={(e) => (e.target.style.transform = "scale(1)")}
-            >
-              Trash
-            </button>
-          </div>
-
           <div
             style={{
               display: "grid",
@@ -128,51 +138,60 @@ const Projects = () => {
               gap: "20px",
             }}
           >
-            {projects
-              .slice(0, showAll ? projects.length : 2) // If "ALL" is selected, show all projects; if "Trash" is selected, show only 2
-              .map((project) => (
-                <div
-                  key={project.id}
+            {projects.map((project) => (
+              <div
+                key={project.id}
+                style={{
+                  position: "relative",
+                  overflow: "hidden",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  transition: "transform 0.3s ease",
+                }}
+              >
+                <img
+                  src={project.img}
+                  alt={project.title}
                   style={{
-                    position: "relative",
-                    overflow: "hidden",
-                    borderRadius: "10px",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
                     transition: "transform 0.3s ease",
                   }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    backgroundColor: "#FF6347",
+                    borderRadius: "50%",
+                    padding: "5px 12px",
+                    color: "white",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onClick={() => handleMakeSaveRequest(project.id)}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "rgba(0, 0, 0, 0.5)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#FF6347")
+                  }
                 >
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    style={{
-                      width: "100%",
-                      height: "200px",
-                      objectFit: "cover",
-                      transition: "transform 0.3s ease",
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "0",
-                      left: "0",
-                      right: "0",
-                      bottom: "0",
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      opacity: "0",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      transition: "opacity 0.3s ease",
-                    }}
-                  >
-                    <h3 style={{ color: "white", fontSize: "1.5rem" }}>
-                      {project.title}
-                    </h3>
-                  </div>
+                  <i class="fas fa-save"></i>
                 </div>
-              ))}
+              </div>
+            ))}
+
           </div>
+          
+            {projects.length == 0 && (
+              <p style={{ color: "#666", fontSize: "16px" }}>
+                No saved projects available at the moment.
+              </p>
+            )}
         </div>
       </div>
       <Footer /> {/* Footer Component */}
