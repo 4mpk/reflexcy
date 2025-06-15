@@ -48,6 +48,7 @@ const WhyUs = () => {
   return (
     <div className="container">
       <Navbar />
+      <div style={{ paddingBottom: "110px" }}></div>
       <div className="section">
         <div className="whyus-title interactive">Why Us ? Why Reflexcy?</div>
         <p className="whyus-body1 glass-morph">
@@ -189,7 +190,7 @@ styles.innerHTML = `
   }
 
   .interactive {
-    margin: 50px auto;
+    margin: 0px auto 50px auto;
     width: 50%;
     background-color: #85AFB1;
     padding: 40px;
