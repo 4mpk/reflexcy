@@ -46,22 +46,26 @@ const HomePage = () => {
     setIsSortMenuOpen(false);
   };
   const [favoriteProjectId, setFavoriteProjectId] = useState(0);
-  const [shouldMakeFavoriteRequest, setshouldMakeFavoriteRequest] = useState(false);
+  const [shouldMakeFavoriteRequest, setshouldMakeFavoriteRequest] =
+    useState(false);
   useEffect(() => {
     if (!shouldMakeFavoriteRequest) return;
     const submitDataForm = async () => {
       try {
-        const response = await fetch(ENDPOINTS.MakeFavorite + `?templateId=${favoriteProjectId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          },
-        });
+        const response = await fetch(
+          ENDPOINTS.MakeFavorite + `?templateId=${favoriteProjectId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
         if (response.ok) {
-            window.location.reload();
+          window.location.reload();
         } else if (response.status == "401") {
-          localStorage.removeItem('access_token');
+          localStorage.removeItem("access_token");
         } else {
           const data = await response.data();
         }
@@ -81,17 +85,20 @@ const HomePage = () => {
     if (!shouldMakeSaveRequest) return;
     const submitDataForm = async () => {
       try {
-        const response = await fetch(ENDPOINTS.MakeSave + `?templateId=${savedProjectId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          },
-        });
+        const response = await fetch(
+          ENDPOINTS.MakeSave + `?templateId=${savedProjectId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
         if (response.ok) {
-            window.location.reload();
+          window.location.reload();
         } else if (response.status == "401") {
-          localStorage.removeItem('access_token');
+          localStorage.removeItem("access_token");
         } else {
           const data = await response.data();
         }
@@ -106,8 +113,8 @@ const HomePage = () => {
   }, [shouldMakeSaveRequest, savedProjectId]);
 
   const handleCartClick = (projectId) => {
-    localStorage.setItem('ProjectId', projectId);
-    window.location.href="/DataForm";
+    localStorage.setItem("ProjectId", projectId);
+    window.location.href = "/DataForm";
   };
 
   const handleMakeFavoriteRequest = (projectId) => {
@@ -120,29 +127,30 @@ const HomePage = () => {
     setshouldMakeSaveRequest(true);
   };
 
-  let token = localStorage.getItem('access_token');
+  let token = localStorage.getItem("access_token");
   useEffect(() => {
     const GetFavorites = async () => {
       try {
         const response = await fetch(ENDPOINTS.FavoriteList, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
         if (response.ok) {
-          const items = await response.json();  
-          const ids = items.map(item => item.templateId);
-          const favoriteProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
+          const items = await response.json();
+          const ids = items.map((item) => item.templateId);
+          const favoriteProjectIds = initialProjects
+            .filter((project) => ids.includes(project.id))
+            .map((item) => item.id);
           setFavProjectIds(favoriteProjectIds);
         } else if (response.status == "401") {
-          localStorage.removeItem('access_token');
+          localStorage.removeItem("access_token");
         } else {
           const data = await response.json();
         }
-      } catch (error) {
-      } 
+      } catch (error) {}
     };
 
     GetFavorites();
@@ -151,24 +159,25 @@ const HomePage = () => {
     const GetSavedProjects = async () => {
       try {
         const response = await fetch(ENDPOINTS.SavedList, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
         if (response.ok) {
-          const items = await response.json();  
-          const ids = items.map(item => item.templateId);
-          const savedProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
+          const items = await response.json();
+          const ids = items.map((item) => item.templateId);
+          const savedProjectIds = initialProjects
+            .filter((project) => ids.includes(project.id))
+            .map((item) => item.id);
           setSavedProjectIds(savedProjectIds);
         } else if (response.status == "401") {
-          localStorage.removeItem('access_token');
+          localStorage.removeItem("access_token");
         } else {
           const data = await response.json();
         }
-      } catch (error) {
-      } 
+      } catch (error) {}
     };
 
     GetSavedProjects();
@@ -177,18 +186,21 @@ const HomePage = () => {
     setSelectedCategory(category);
   };
   // Filter by category
-  
+
   const handleSearchProjects = (e) => {
     setSearchText(e.target.value);
-  }
+  };
   let filteredProjects = [...projects];
-  if (selectedCategory !== "All" || searchText !== "")
-  {
+  if (selectedCategory !== "All" || searchText !== "") {
     if (selectedCategory !== "All") {
-      filteredProjects = filteredProjects.filter((p) => p.category === selectedCategory);
+      filteredProjects = filteredProjects.filter(
+        (p) => p.category === selectedCategory
+      );
     }
     if (searchText !== "") {
-      filteredProjects = filteredProjects.filter((p) => p.title.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
+      filteredProjects = filteredProjects.filter((p) =>
+        p.title.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
+      );
     }
   }
   // Apply sorting
@@ -209,8 +221,8 @@ const HomePage = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      <Navbar onChange={handleSearchProjects}/>
-      {localStorage.getItem('access_token') != null && (<Sidebar />)}
+      <Navbar onChange={handleSearchProjects} />
+      {localStorage.getItem("access_token") != null && <Sidebar />}
       <motion.div
         style={styles.mainContent}
         initial={{ y: 50, opacity: 0 }}
@@ -299,78 +311,100 @@ const HomePage = () => {
         >
           {filteredProjects.map((project) => (
             <div>
-<motion.div
-              key={project.id}
-              style={styles.portfolioItem}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.6 }}
-              
-            >
-              <div style={styles.imageContainer}>
-                <motion.img
-                  src={project.img}
-                  alt={project.title || "Project"}
-                  style={styles.portfolioImg}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => handleCartClick(project.id)}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                />
-                
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    backgroundColor: favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
-                    borderRadius: "50%",
-                    padding: "5px 12px",
-                    color: "white",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onClick={() => handleMakeFavoriteRequest(project.id)}
-                  onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
-                  }
-                >
-                  ♡
-                </div>
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "55px",
-                    backgroundColor: savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
-                    borderRadius: "50%",
-                    padding: "5px 12px",
-                    color: "white",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onClick={() => handleMakeSaveRequest(project.id)}
-                  onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
-                  }
-                >
-                  <i class="fas fa-save"></i>
-                </div>
-              </div>
+              <motion.div
+                key={project.id}
+                style={styles.portfolioItem}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div style={styles.imageContainer}>
+                  <motion.img
+                    src={project.img}
+                    alt={project.title || "Project"}
+                    style={styles.portfolioImg}
+                    whileHover={{ scale: 1.05 }}
+                    onClick={() => handleCartClick(project.id)}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  />
 
-            </motion.div>
-            <div style={{display: "flex", justifyContent: "space-between", margin: "0px 15px 15px"}}>
-            <span>{project.title}</span>  
-            <span>{project.isPaid ? project.price : "Free"}</span>  
-            </div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      backgroundColor: favProjectIds.includes(project.id)
+                        ? "#FF6347"
+                        : "rgba(0, 0, 0, 0.5)",
+                      borderRadius: "50%",
+                      padding: "5px 12px",
+                      color: "white",
+                      fontSize: "24px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                    }}
+                    onClick={() => handleMakeFavoriteRequest(project.id)}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = favProjectIds.includes(
+                        project.id
+                      )
+                        ? "rgba(0, 0, 0, 0.5)"
+                        : "#FF6347")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = favProjectIds.includes(
+                        project.id
+                      )
+                        ? "#FF6347"
+                        : "rgba(0, 0, 0, 0.5)")
+                    }
+                  >
+                    ♡
+                  </div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      right: "55px",
+                      backgroundColor: savedProjectIds.includes(project.id)
+                        ? "#FF6347"
+                        : "rgba(0, 0, 0, 0.5)",
+                      borderRadius: "50%",
+                      padding: "5px 12px",
+                      color: "white",
+                      fontSize: "24px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                    }}
+                    onClick={() => handleMakeSaveRequest(project.id)}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor =
+                        savedProjectIds.includes(project.id)
+                          ? "rgba(0, 0, 0, 0.5)"
+                          : "#FF6347")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor =
+                        savedProjectIds.includes(project.id)
+                          ? "#FF6347"
+                          : "rgba(0, 0, 0, 0.5)")
+                    }
+                  >
+                    <i class="fas fa-save"></i>
+                  </div>
+                </div>
+              </motion.div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  margin: "0px 15px 15px",
+                }}
+              >
+                <span>{project.title}</span>
+                <span>{project.isPaid ? project.price : "Free"}</span>
+              </div>
             </div>
           ))}
         </motion.div>
@@ -454,7 +488,7 @@ const styles = {
     borderRadius: "25px",
     cursor: "pointer",
     fontSize: "18px",
-    zIndex: 1
+    zIndex: 1,
   },
   filterIcon: {
     background: "#5c9ea6",

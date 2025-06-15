@@ -16,37 +16,36 @@ import {
 } from "react-icons/fa";
 import ENDPOINTS from "../RequestUrls";
 
-const Navbar =  (props) => {
+const Navbar = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
-  
-  
-    useEffect(() => {
+
+  useEffect(() => {
     async function fetchData() {
       try {
-          const response = await fetch(ENDPOINTS.GetProfileImage, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            },
-          });
-          if (response.ok) {
-            const result = await response.json();
-            setProfileImage(result.url);
-          } else if (response.status == "401") {
-            localStorage.removeItem('access_token');
-          } else {
-            const data = await response.data();
-          }
-        } catch (error) {
-          console.error("Upload failed:", error);
+        const response = await fetch(ENDPOINTS.GetProfileImage, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        });
+        if (response.ok) {
+          const result = await response.json();
+          setProfileImage(result.url);
+        } else if (response.status == "401") {
+          localStorage.removeItem("access_token");
+        } else {
+          const data = await response.data();
         }
+      } catch (error) {
+        console.error("Upload failed:", error);
+      }
     }
-    if (localStorage.getItem('access_token') !== null) {
-    fetchData();
+    if (localStorage.getItem("access_token") !== null) {
+      fetchData();
     }
-  }, [])
+  }, []);
   return (
     <nav className="navbar">
       {/* Logo */}
@@ -88,40 +87,54 @@ const Navbar =  (props) => {
         </Link>
       </div>
 
-        {localStorage.getItem('access_token') == null && (
-      <div className={`nav-links ${menuOpen ? "active" : ""}`}>
+      {localStorage.getItem("access_token") == null && (
+        <div className={`nav-links ${menuOpen ? "active" : ""}`}>
           <Link
-          to="/AuthPage"
-          className="nav-button signup-btn"
-          onClick={() => setMenuOpen(false)}
-        >
-          SignUp
-        </Link>
-      </div>
+            to="/AuthPage"
+            className="nav-button signup-btn"
+            onClick={() => setMenuOpen(false)}
+          >
+            SignUp
+          </Link>
+        </div>
       )}
-      
-      
-        {localStorage.getItem('access_token') !== null && (
-          <div className={`nav-links ${menuOpen ? "active" : ""}`}>
+
+      {localStorage.getItem("access_token") !== null && (
+        <div className={`nav-links ${menuOpen ? "active" : ""}`}>
           <Link
-          to="/Edit"
-          className="nav-button signup-btn"
-          onClick={() => setMenuOpen(false)}
-        >
-          {profileImage !== null && (
-            <img
-                  src={profileImage}
-                  alt="Profile"
-                  className="profileImage"
-                  style={{borderRadius: "50%"}}
-                />
-          )}
-          {profileImage === null && (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users icon"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-          )}
-        </Link>
-      </div>
+            to="/Edit"
+            className="nav-button signup-btn"
+            onClick={() => setMenuOpen(false)}
+          >
+            {profileImage !== null && (
+              <img
+                src={profileImage}
+                alt="Profile"
+                className="profileImage"
+                style={{ borderRadius: "50%" }}
+              />
+            )}
+            {profileImage === null && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-users icon"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            )}
+          </Link>
+        </div>
       )}
     </nav>
   );
@@ -175,6 +188,7 @@ styles.innerHTML = `
       padding: 8px;
       width: 150px;
       transition: all 0.4s ease-in-out;
+      box-shadow: none;
   }
 
   .search-bar:hover {
