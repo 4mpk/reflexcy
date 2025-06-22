@@ -29,6 +29,7 @@ const EditProfile = () => {
           setProfileImage(result.url);
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           const data = await response.data();
         }
@@ -72,6 +73,7 @@ const EditProfile = () => {
         setError(null);
       } else if (response.status == "401") {
         localStorage.removeItem('access_token');
+        window.location.href = "/AuthPage";
       } else {
         const data = await response.data();
       }
@@ -92,6 +94,7 @@ const EditProfile = () => {
         setProfileImage(null);
       } else if (response.status == "401") {
         localStorage.removeItem('access_token');
+        window.location.href = "/AuthPage";
       } else {
         const data = await response.data();
       }
@@ -146,7 +149,7 @@ const EditProfile = () => {
           }
       }
     >
-      <Navbar />
+      <Navbar imageUrl={profileImage} />
       {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div style={styles.mainContent}>
         <div style={styles.profileBox}>

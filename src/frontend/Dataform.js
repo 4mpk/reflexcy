@@ -44,7 +44,6 @@ const DataForm = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    debugger
     if (name === "profile") {
       setFormData({
         ...formData,
@@ -129,6 +128,7 @@ const DataForm = () => {
           toast.success('File downloaded successfully!');
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           const data = await response.data();
           toast.error('Some thing went wrong please try again');

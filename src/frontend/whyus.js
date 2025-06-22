@@ -7,7 +7,7 @@ import user1 from "./assests/images/pic1.png";
 import user2 from "./assests/images/pic2.jpg";
 import user3 from "./assests/images/pic3.jpg";
 import user4 from "./assests/images/pic4.jpg";
-
+import Sidebar from "./components/Sidebar";
 const WhyUs = () => {
   useEffect(() => {
     document.body.classList.add("page-enter");
@@ -48,6 +48,7 @@ const WhyUs = () => {
   return (
     <div className="container">
       <Navbar />
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div className="section">
         <div className="whyus-title interactive">Why Us ? Why Reflexcy?</div>
         <p className="whyus-body1 glass-morph">
@@ -139,6 +140,7 @@ styles.innerHTML = `
 
   .section {
     margin-bottom: 80px;
+    padding-top: 110px;
   }
 
   .different-content, .what-we-do-content {
@@ -189,7 +191,7 @@ styles.innerHTML = `
   }
 
   .interactive {
-    margin: 50px auto;
+    margin: 0px auto 50px;
     width: 50%;
     background-color: #85AFB1;
     padding: 40px;

@@ -32,6 +32,7 @@ const Downloads = () => {
           // setProjects(downloadProjects);
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           const data = await response.json();
           toast.error('Error: ' + data.error.message);
@@ -85,6 +86,7 @@ const Downloads = () => {
         toast.success('File downloaded successfully!');
       } else if (response.status == "401") {
         localStorage.removeItem('access_token');
+        window.location.href = "/AuthPage";
       } else {
         const data = await response.json();
         toast.error('Error: ' + data.error.message);

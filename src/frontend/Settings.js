@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
+import ENDPOINTS from "./RequestUrls";
+import { toast } from 'react-toastify';
 const UserSettingsPage = () => {
   const [theme, setTheme] = useState("light");
   const [language, setLanguage] = useState("english");
@@ -15,14 +16,33 @@ const UserSettingsPage = () => {
 
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (
       window.confirm(
         "Are you sure you want to delete your account? This action is permanent."
       )
     ) {
-      console.log("User account deleted");
-      alert("Account deleted");
+      try {
+      const response = await fetch(ENDPOINTS.DeleteAccount, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+      });
+      if (response.ok) {
+        toast.success('Account deleted.');
+        setTimeout(() => {
+          localStorage.removeItem('access_token');
+          window.location.href="/";
+        }, 3000);
+      } else {
+        const data = await response.json();
+        toast.error('Error: ' + data.error.message);
+      }
+    } catch (error) {
+      toast.error('Network Error: ' + error);
+    }
     }
   };
 

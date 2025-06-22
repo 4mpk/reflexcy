@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ENDPOINTS from "./RequestUrls";
 import { toast } from 'react-toastify';
-
+import Sidebar from "./components/Sidebar";
 const ContactSupportPage = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -25,7 +25,7 @@ const ContactSupportPage = () => {
         setRedirectCountdown((prev) => {
           if (prev === 1) {
             clearInterval(timer);
-            navigate("/settings");
+            navigate("/");
           }
           return prev - 1;
         });
@@ -72,6 +72,7 @@ const ContactSupportPage = () => {
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
       <Navbar />
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div
         style={{
           minHeight: "calc(100vh - 120px)",

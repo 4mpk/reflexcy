@@ -78,6 +78,7 @@ const ForgotPassword = () => {
             toast.success('Forget Password Email Sent successfully!');
           } else if (response.status == "401") {
             localStorage.removeItem('access_token');
+            window.location.href = "/AuthPage";
           } else {
             const data = await response.json();
             toast.error('Error: ' + data.error.message);
@@ -123,6 +124,7 @@ const ForgotPassword = () => {
           toast.success('Verified Code successfully!');
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           toast.error('Code is wrong');
         }
@@ -186,6 +188,7 @@ const ForgotPassword = () => {
           toast.success('Password changed successfully!');
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           const data = await response.data();
           toast.error('Error: ' + data.error.message);

@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ENDPOINTS from "./RequestUrls";
 import { toast } from 'react-toastify';
-
+import Sidebar from "./components/Sidebar";
 // ✅ Blue Spinner Component for Thank You page
 const Spinner = () => (
   <svg
@@ -58,7 +58,7 @@ const ReportBugPage = () => {
         setRedirectCountdown((prev) => {
           if (prev === 1) {
             clearInterval(timer);
-            navigate("/settings");
+            navigate("/");
           }
           return prev - 1;
         });
@@ -109,6 +109,7 @@ const ReportBugPage = () => {
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
       <Navbar />
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <div
         style={{
           display: "flex",

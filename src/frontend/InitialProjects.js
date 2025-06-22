@@ -18,16 +18,16 @@ const initialProjects = [
     img: tem1,
     isPaid: false,
   },
-  { id: 2, title: "Modern App", category: "Software", img: tem2, isPaid: true, price: "20$" },
-  { id: 3, title: "Dev Tools", category: "Software", img: tem3, isPaid: false },
-  {
-    id: 4,
-    title: "Analytics UI",
-    category: "Software",
-    img: tem4,
-    isPaid: true,
-    price: "5$"
-  },
+  // { id: 2, title: "Modern App", category: "Software", img: tem2, isPaid: true, price: "20$" },
+  // { id: 3, title: "Dev Tools", category: "Software", img: tem3, isPaid: false },
+  // {
+  //   id: 4,
+  //   title: "Analytics UI",
+  //   category: "Software",
+  //   img: tem4,
+  //   isPaid: true,
+  //   price: "5$"
+  // },
   {
     id: 5,
     title: "Photo Bliss",
@@ -35,14 +35,14 @@ const initialProjects = [
     img: tem10,
     isPaid: false,
   },
-  {
-    id: 6,
-    title: "Studio Light",
-    category: "Photography",
-    img: tem6,
-    isPaid: true,
-    price: "50$"
-  },
+  // {
+  //   id: 6,
+  //   title: "Studio Light",
+  //   category: "Photography",
+  //   img: tem6,
+  //   isPaid: true,
+  //   price: "50$"
+  // },
   {
     id: 7,
     title: "Street Style",
@@ -50,21 +50,21 @@ const initialProjects = [
     img: tem7,
     isPaid: false,
   },
-  {
-    id: 8,
-    title: "Luxury Outfit",
-    category: "Fashion",
-    img: tem8,
-    isPaid: true,
-    price: "25$"
-  },
-  {
-    id: 9,
-    title: "Poster Design",
-    category: "Graphic Design",
-    img: tem1,
-    isPaid: false,
-  },
+  // {
+  //   id: 8,
+  //   title: "Luxury Outfit",
+  //   category: "Fashion",
+  //   img: tem8,
+  //   isPaid: true,
+  //   price: "25$"
+  // },
+  // {
+  //   id: 9,
+  //   title: "Poster Design",
+  //   category: "Graphic Design",
+  //   img: tem1,
+  //   isPaid: false,
+  // },
   {
     id: 10,
     title: "Creative Branding",
@@ -73,18 +73,18 @@ const initialProjects = [
     isPaid: true,
     price: "10$"
   },
-  {
-    id: 11,
-    title: "PC Build Showcase",
-    category: "Computer",
-    img: tem9,
-    isPaid: false,
-  },
+  // {
+  //   id: 11,
+  //   title: "PC Build Showcase",
+  //   category: "Computer",
+  //   img: tem9,
+  //   isPaid: false,
+  // },
   {
     id: 12,
     title: "Tech Stack",
     category: "Computer",
-    img: tem10,
+    img: tem1,
     isPaid: true,
     price: "35$"
   },

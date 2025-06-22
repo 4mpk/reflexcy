@@ -14,6 +14,7 @@ export default function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
   const handleLogout = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('id');
     window.location.href="/";
   };
   return (

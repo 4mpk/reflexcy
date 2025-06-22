@@ -100,9 +100,14 @@ export default function AuthPage() {
 
         const data = await response.json();
         if (response.ok) {
-          localStorage.setItem('access_token', data.access_token);
-          setToken(data.access_token);
-          window.location.href = "/";
+          if (data.access_token === undefined) {
+            toast.error('Invalid email or password!');
+          }
+          else {
+            localStorage.setItem('access_token', data.access_token);
+            setToken(data.access_token);
+            window.location.href = "/";
+          }
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
         } else {

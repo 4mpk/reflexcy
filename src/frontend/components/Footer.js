@@ -154,7 +154,7 @@ function Footer() {
             }}
           >
             <a
-              href="/about-us"
+              href="/ContactSupport"
               style={{
                 color: "#000", // Link text in black
                 textDecoration: "none",
@@ -165,10 +165,10 @@ function Footer() {
               onMouseOver={(e) => (e.target.style.color = "#FF6347")}
               onMouseOut={(e) => (e.target.style.color = "#000")}
             >
-              About Us
+              Contact Support
             </a>
             <a
-              href="/services"
+              href="/ReportBug"
               style={{
                 color: "#000", // Link text in black
                 textDecoration: "none",
@@ -179,10 +179,10 @@ function Footer() {
               onMouseOver={(e) => (e.target.style.color = "#FF6347")}
               onMouseOut={(e) => (e.target.style.color = "#000")}
             >
-              Services
+              Report a Bug
             </a>
             <a
-              href="/privacy-policy"
+              href="/FeatureRequest"
               style={{
                 color: "#000", // Link text in black
                 textDecoration: "none",
@@ -193,10 +193,10 @@ function Footer() {
               onMouseOver={(e) => (e.target.style.color = "#FF6347")}
               onMouseOut={(e) => (e.target.style.color = "#000")}
             >
-              Privacy Policy
+              Request a Feature
             </a>
             <a
-              href="/terms"
+              href="/Feedback"
               style={{
                 color: "#000", // Link text in black
                 textDecoration: "none",
@@ -207,7 +207,7 @@ function Footer() {
               onMouseOver={(e) => (e.target.style.color = "#FF6347")}
               onMouseOut={(e) => (e.target.style.color = "#000")}
             >
-              Terms of Service
+              Feedback or Suggestion
             </a>
           </div>
         </div>

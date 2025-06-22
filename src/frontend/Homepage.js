@@ -15,6 +15,7 @@ import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 import initialProjects from "./InitialProjects";
 import ENDPOINTS from "./RequestUrls";
+import { toast } from "react-toastify";
 
 const sortOptions = [
   { label: "Newest", icon: <FaClock /> },
@@ -59,9 +60,10 @@ const HomePage = () => {
           },
         });
         if (response.ok) {
-            window.location.reload();
+          window.location.reload();
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           const data = await response.data();
         }
@@ -74,6 +76,54 @@ const HomePage = () => {
 
     submitDataForm();
   }, [shouldMakeFavoriteRequest, favoriteProjectId]);
+
+  const [downloadProjectId, setDownloadProjectId] = useState(0);
+  const [shouldDownloadRequest, setshouldDownloadRequest] = useState(false);
+  useEffect(() => {
+    if (!shouldDownloadRequest) return;
+    const submitDownloadForm = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.DownloadSampleFile + `?projectId=${downloadProjectId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+
+          // Optionally get filename from headers
+          const contentDisposition = response.headers.get("Content-Disposition");
+          let fileName = "downloaded-file";
+          if (contentDisposition && contentDisposition.includes("filename=")) {
+            fileName = contentDisposition
+              .split("filename=")[1]
+              .replace(/"/g, "")
+              .trim();
+          }
+          a.download = fileName;
+
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(downloadUrl);
+
+          toast.success('File downloaded successfully!');
+        } else {
+          const data = await response.data();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setshouldDownloadRequest(false); // reset trigger
+      }
+    };
+
+    submitDownloadForm();
+  }, [shouldDownloadRequest, downloadProjectId]);
 
   const [savedProjectId, setSaveProjectId] = useState(0);
   const [shouldMakeSaveRequest, setshouldMakeSaveRequest] = useState(false);
@@ -89,9 +139,10 @@ const HomePage = () => {
           },
         });
         if (response.ok) {
-            window.location.reload();
+          window.location.reload();
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
+          window.location.href = "/AuthPage";
         } else {
           const data = await response.data();
         }
@@ -106,8 +157,13 @@ const HomePage = () => {
   }, [shouldMakeSaveRequest, savedProjectId]);
 
   const handleCartClick = (projectId) => {
-    localStorage.setItem('ProjectId', projectId);
-    window.location.href="/DataForm";
+    if (localStorage.getItem('access_token') != null) {
+      localStorage.setItem('ProjectId', projectId);
+      window.location.href = "/DataForm";
+    }
+    else {
+      window.location.href = "/AuthPage";
+    }
   };
 
   const handleMakeFavoriteRequest = (projectId) => {
@@ -118,6 +174,11 @@ const HomePage = () => {
   const handleMakeSaveRequest = (projectId) => {
     setSaveProjectId(projectId);
     setshouldMakeSaveRequest(true);
+  };
+
+  const handleDownloadRequest = (projectId) => {
+    setDownloadProjectId(projectId);
+    setshouldDownloadRequest(true);
   };
 
   let token = localStorage.getItem('access_token');
@@ -132,7 +193,7 @@ const HomePage = () => {
           },
         });
         if (response.ok) {
-          const items = await response.json();  
+          const items = await response.json();
           const ids = items.map(item => item.templateId);
           const favoriteProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
           setFavProjectIds(favoriteProjectIds);
@@ -142,7 +203,7 @@ const HomePage = () => {
           const data = await response.json();
         }
       } catch (error) {
-      } 
+      }
     };
 
     GetFavorites();
@@ -158,7 +219,7 @@ const HomePage = () => {
           },
         });
         if (response.ok) {
-          const items = await response.json();  
+          const items = await response.json();
           const ids = items.map(item => item.templateId);
           const savedProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
           setSavedProjectIds(savedProjectIds);
@@ -168,7 +229,7 @@ const HomePage = () => {
           const data = await response.json();
         }
       } catch (error) {
-      } 
+      }
     };
 
     GetSavedProjects();
@@ -177,13 +238,12 @@ const HomePage = () => {
     setSelectedCategory(category);
   };
   // Filter by category
-  
+
   const handleSearchProjects = (e) => {
     setSearchText(e.target.value);
   }
   let filteredProjects = [...projects];
-  if (selectedCategory !== "All" || searchText !== "")
-  {
+  if (selectedCategory !== "All" || searchText !== "") {
     if (selectedCategory !== "All") {
       filteredProjects = filteredProjects.filter((p) => p.category === selectedCategory);
     }
@@ -209,7 +269,7 @@ const HomePage = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      <Navbar onChange={handleSearchProjects}/>
+      <Navbar onChange={handleSearchProjects} />
       {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <motion.div
         style={styles.mainContent}
@@ -281,13 +341,6 @@ const HomePage = () => {
             </motion.button>
           ))}
 
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            style={styles.filterIcon}
-          >
-            <FaFilter />
-          </motion.button>
         </motion.div>
 
         {/* Portfolio Items */}
@@ -299,78 +352,102 @@ const HomePage = () => {
         >
           {filteredProjects.map((project) => (
             <div>
-<motion.div
-              key={project.id}
-              style={styles.portfolioItem}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.6 }}
-              
-            >
-              <div style={styles.imageContainer}>
-                <motion.img
-                  src={project.img}
-                  alt={project.title || "Project"}
-                  style={styles.portfolioImg}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => handleCartClick(project.id)}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                />
-                
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    backgroundColor: favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
-                    borderRadius: "50%",
-                    padding: "5px 12px",
-                    color: "white",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onClick={() => handleMakeFavoriteRequest(project.id)}
-                  onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
-                  }
-                >
-                  ♡
-                </div>
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "55px",
-                    backgroundColor: savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
-                    borderRadius: "50%",
-                    padding: "5px 12px",
-                    color: "white",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onClick={() => handleMakeSaveRequest(project.id)}
-                  onMouseEnter={(e) =>
-                    (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
-                  }
-                >
-                  <i class="fas fa-save"></i>
-                </div>
-              </div>
+              <motion.div
+                key={project.id}
+                style={styles.portfolioItem}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.6 }}
 
-            </motion.div>
-            <div style={{display: "flex", justifyContent: "space-between", margin: "0px 15px 15px"}}>
-            <span>{project.title}</span>  
-            <span>{project.isPaid ? project.price : "Free"}</span>  
-            </div>
+              >
+                <div style={styles.imageContainer}>
+                  <motion.img
+                    src={project.img}
+                    alt={project.title || "Project"}
+                    style={styles.portfolioImg}
+                    whileHover={{ scale: 1.05 }}
+                    onClick={() => handleCartClick(project.id)}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  />
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      right: "10px",
+                      backgroundColor: favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
+                      borderRadius: "50%",
+                      padding: "5px 12px",
+                      color: "white",
+                      fontSize: "24px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                    }}
+                    onClick={() => handleMakeFavoriteRequest(project.id)}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = favProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
+                    }
+                  >
+                    ♡
+                  </div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      right: "55px",
+                      backgroundColor: savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)",
+                      borderRadius: "50%",
+                      padding: "5px 12px",
+                      color: "white",
+                      fontSize: "24px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                    }}
+                    onClick={() => handleMakeSaveRequest(project.id)}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "rgba(0, 0, 0, 0.5)" : "#FF6347")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = savedProjectIds.includes(project.id) ? "#FF6347" : "rgba(0, 0, 0, 0.5)")
+                    }
+                  >
+                    <i class="fas fa-save"></i>
+                  </div>
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      right: "105px",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      borderRadius: "50%",
+                      padding: "5px 12px",
+                      color: "white",
+                      fontSize: "24px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                    }}
+                    onClick={() => handleDownloadRequest(project.id)}
+                    onMouseEnter={(e) =>
+                      (e.target.style.backgroundColor = "#FF6347")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.backgroundColor = "rgba(0, 0, 0, 0.5)")
+                    }
+                  >
+                    <i class="fas fa-download"></i>
+                  </div>
+                </div>
+
+              </motion.div>
+              <div style={{ display: "flex", justifyContent: "space-between", margin: "0px 15px 15px" }}>
+                <span style={{ fontSize: "20px" }}>{project.title}</span>
+                <span style={{ fontSize: "20px" }}>{project.isPaid ? project.price : "Free"}</span>
+              </div>
             </div>
           ))}
         </motion.div>

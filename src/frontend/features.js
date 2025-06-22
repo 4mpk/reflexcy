@@ -5,23 +5,25 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import {
   FaFolderOpen,
-  FaPaintBrush,
   FaCogs,
-  FaMobileAlt,
   FaCloudUploadAlt,
-  FaMoon,
-  FaGlobe,
-  FaDownload,
+  FaDownload
 } from "react-icons/fa";
+import Sidebar from "./components/Sidebar";
 
 const FeaturesPage = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
+const handleButton = () => {
+  window.location.href = "/";
+};
+
   return (
     <div className="features-page">
       <Navbar />
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <section className="hero-section" data-aos="fade">
         <h1>Our Key Features</h1>
         <p>Discover all the amazing features of our portfolio builder.</p>
@@ -35,34 +37,14 @@ const FeaturesPage = () => {
             <p>Choose from a variety of beautifully designed templates.</p>
           </div>
           <div className="feature-card" data-aos="fade-up">
-            <FaPaintBrush className="icon" />
-            <h3>Customization</h3>
-            <p>Fully customizable layouts, colors, and fonts.</p>
-          </div>
-          <div className="feature-card" data-aos="fade-up">
             <FaCogs className="icon" />
             <h3>Easy-to-Use Editor</h3>
             <p>No coding required; drag and drop content.</p>
           </div>
           <div className="feature-card" data-aos="fade-up">
-            <FaMobileAlt className="icon" />
-            <h3>Mobile-Responsive Design</h3>
-            <p>Portfolios look great on any device.</p>
-          </div>
-          <div className="feature-card" data-aos="fade-up">
             <FaCloudUploadAlt className="icon" />
             <h3>Content Upload</h3>
             <p>Easily upload images, videos, and documents.</p>
-          </div>
-          <div className="feature-card" data-aos="fade-up">
-            <FaMoon className="icon" />
-            <h3>Light & Dark Mode</h3>
-            <p>Choose between light and dark modes.</p>
-          </div>
-          <div className="feature-card" data-aos="fade-up">
-            <FaGlobe className="icon" />
-            <h3>Multi-Language Support</h3>
-            <p>Create portfolios in multiple languages.</p>
           </div>
           <div className="feature-card" data-aos="fade-up">
             <FaDownload className="icon" />
@@ -75,7 +57,7 @@ const FeaturesPage = () => {
       <section className="cta-section" data-aos="fade">
         <h2>Ready to Build Your Portfolio?</h2>
         <p>Start creating your personalized portfolio with ease and style.</p>
-        <button className="cta-button">Get Started</button>
+        <button className="cta-button" onClick={handleButton}>Get Started</button>
       </section>
 
       <Footer />
@@ -101,6 +83,7 @@ const FeaturesPage = () => {
           background-color: #f4f4f4;
           padding: 50px 20px;
           text-align: center;
+          padding-top: 110px;
         }
 
         .hero-section h1 {

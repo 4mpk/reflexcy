@@ -7,11 +7,15 @@ import {
   FaRobot,
   FaChartLine,
   FaMicrophone,
-  FaMobileAlt,
   FaUsers,
   FaPuzzlePiece,
+  FaPaintBrush,
+  FaMobileAlt,
+  FaMoon,
+  FaGlobe,
 } from "react-icons/fa";
-
+import Sidebar from "./components/Sidebar";
+import { Link } from "react-router-dom";
 const UpdatesPage = () => {
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -20,7 +24,7 @@ const UpdatesPage = () => {
   return (
     <div className="updates-page">
       <Navbar />
-
+      {localStorage.getItem('access_token') != null && (<Sidebar />)}
       <section className="hero-section">
         <h1>Upcoming Features</h1>
         <p>
@@ -62,7 +66,34 @@ const UpdatesPage = () => {
               ✨ Invite teammates or mentors to collaborate on your portfolio.
             </p>
           </div>
-
+          <div className="update-card" data-aos="fade-up">
+            <FaUsers className="icon" />
+            <h3>Customization</h3>
+            <p>
+              ✨ Fully customizable layouts, colors, and fonts.
+            </p>
+          </div>
+          <div className="update-card" data-aos="fade-up">
+            <FaUsers className="icon" />
+            <h3>Mobile-Responsive Design</h3>
+            <p>
+              ✨ Portfolios look great on any device.
+            </p>
+          </div>
+          <div className="update-card" data-aos="fade-up">
+            <FaUsers className="icon" />
+            <h3>Light & Dark Mode</h3>
+            <p>
+              ✨ Choose between light and dark modes.
+            </p>
+          </div>
+          <div className="update-card" data-aos="fade-up">
+            <FaUsers className="icon" />
+            <h3>Multi-Language Support</h3>
+            <p>
+              ✨ Create portfolios in multiple languages.
+            </p>
+          </div>
           <div className="update-card" data-aos="fade-up">
             <FaPuzzlePiece className="icon" />
             <h3>Custom Widgets</h3>
@@ -74,7 +105,9 @@ const UpdatesPage = () => {
       <section className="cta-section">
         <h2>Got an idea?</h2>
         <p>Let us know what features you’d love to see next!</p>
-        <button className="cta-button">Submit Feature Request</button>
+        <Link to="/FeatureRequest">
+          <button className="cta-button">Request a Feature</button>
+        </Link>
       </section>
 
       <Footer />
@@ -98,7 +131,7 @@ const UpdatesPage = () => {
 
         .hero-section {
           background-color: #f4f4f4;
-          padding: 60px 20px;
+          padding: 110px 20px 60px;
           text-align: center;
         }
 
