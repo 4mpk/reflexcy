@@ -17,7 +17,6 @@ import {
 import ENDPOINTS from "../RequestUrls";
 
 const Navbar = (props) => {
-const Navbar = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileImage, setProfileImage] = useState(props.imageUrl !== undefined ? props.imageUrl : null);
@@ -52,7 +51,7 @@ const Navbar = (props) => {
     if (localStorage.getItem('access_token') !== null) {
       fetchData();
     }
-  }, []);
+  }, [])
   return (
     <nav className="navbar">
       {/* Logo */}
@@ -97,13 +96,6 @@ const Navbar = (props) => {
       {localStorage.getItem('access_token') == null && (
         <div className={`nav-links ${menuOpen ? "active" : ""}`}>
           <Link
-            to="/AuthPage"
-            className="nav-button signup-btn"
-            onClick={() => setMenuOpen(false)}
-          >
-            SignUp
-          </Link>
-        </div>
             to="/AuthPage"
             className="nav-button signup-btn"
             onClick={() => setMenuOpen(false)}
