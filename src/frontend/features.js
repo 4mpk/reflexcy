@@ -81,7 +81,7 @@ const handleButton = () => {
 
         .hero-section {
           background-color: #f4f4f4;
-          padding: 50px 20px;
+          padding: 110px 20px 50px 20px;
           text-align: center;
           padding-top: 110px;
         }

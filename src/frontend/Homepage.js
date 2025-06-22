@@ -47,19 +47,24 @@ const HomePage = () => {
     setIsSortMenuOpen(false);
   };
   const [favoriteProjectId, setFavoriteProjectId] = useState(0);
-  const [shouldMakeFavoriteRequest, setshouldMakeFavoriteRequest] = useState(false);
+  const [shouldMakeFavoriteRequest, setshouldMakeFavoriteRequest] =
+    useState(false);
   useEffect(() => {
     if (!shouldMakeFavoriteRequest) return;
     const submitDataForm = async () => {
       try {
-        const response = await fetch(ENDPOINTS.MakeFavorite + `?templateId=${favoriteProjectId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          },
-        });
+        const response = await fetch(
+          ENDPOINTS.MakeFavorite + `?templateId=${favoriteProjectId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
         if (response.ok) {
+          window.location.reload();
           window.location.reload();
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
@@ -131,14 +136,18 @@ const HomePage = () => {
     if (!shouldMakeSaveRequest) return;
     const submitDataForm = async () => {
       try {
-        const response = await fetch(ENDPOINTS.MakeSave + `?templateId=${savedProjectId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          },
-        });
+        const response = await fetch(
+          ENDPOINTS.MakeSave + `?templateId=${savedProjectId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
         if (response.ok) {
+          window.location.reload();
           window.location.reload();
         } else if (response.status == "401") {
           localStorage.removeItem('access_token');
@@ -186,10 +195,10 @@ const HomePage = () => {
     const GetFavorites = async () => {
       try {
         const response = await fetch(ENDPOINTS.FavoriteList, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
         if (response.ok) {
@@ -198,7 +207,7 @@ const HomePage = () => {
           const favoriteProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
           setFavProjectIds(favoriteProjectIds);
         } else if (response.status == "401") {
-          localStorage.removeItem('access_token');
+          localStorage.removeItem("access_token");
         } else {
           const data = await response.json();
         }
@@ -212,10 +221,10 @@ const HomePage = () => {
     const GetSavedProjects = async () => {
       try {
         const response = await fetch(ENDPOINTS.SavedList, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
         if (response.ok) {
@@ -224,7 +233,7 @@ const HomePage = () => {
           const savedProjectIds = initialProjects.filter(project => ids.includes(project.id)).map(item => item.id);
           setSavedProjectIds(savedProjectIds);
         } else if (response.status == "401") {
-          localStorage.removeItem('access_token');
+          localStorage.removeItem("access_token");
         } else {
           const data = await response.json();
         }
@@ -239,16 +248,22 @@ const HomePage = () => {
   };
   // Filter by category
 
+
   const handleSearchProjects = (e) => {
     setSearchText(e.target.value);
-  }
+  };
   let filteredProjects = [...projects];
   if (selectedCategory !== "All" || searchText !== "") {
+  if (selectedCategory !== "All" || searchText !== "") {
     if (selectedCategory !== "All") {
-      filteredProjects = filteredProjects.filter((p) => p.category === selectedCategory);
+      filteredProjects = filteredProjects.filter(
+        (p) => p.category === selectedCategory
+      );
     }
     if (searchText !== "") {
-      filteredProjects = filteredProjects.filter((p) => p.title.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
+      filteredProjects = filteredProjects.filter((p) =>
+        p.title.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
+      );
     }
   }
   // Apply sorting
@@ -531,7 +546,7 @@ const styles = {
     borderRadius: "25px",
     cursor: "pointer",
     fontSize: "18px",
-    zIndex: 1
+    zIndex: 1,
   },
   filterIcon: {
     background: "#5c9ea6",
